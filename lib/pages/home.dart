@@ -1,0 +1,156 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:jpda/comm/func.dart';
+import 'package:jpda/comm/jpda.dart';
+
+class MainPage extends StatefulWidget {
+  @override
+  _MainPageState createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
+  @override
+  void initState() {
+    JPda.user.addListener(update);
+    super.initState();
+    PermUtils.requestPermissions();
+  }
+
+  @override
+  void dispose() {
+    JPda.user.removeListener(update);
+    super.dispose();
+  }
+
+  update() => setState(() => print('update user'));
+
+  @override
+  Widget build(BuildContext context) {
+    return !JPda.user.isLogin ? _buildNoLogin(context) : _buildMain(context);
+  }
+
+  Widget _buildMain(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("采集器"),
+        centerTitle: true,
+      ),
+      body: Container(
+        padding: EdgeInsets.all(10.0),
+        child: GridView.count(
+          crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
+          children: <Widget>[
+            _buildCell("images/pandian.png", "盘点"),
+            _buildCell("images/in.png", "入库"),
+            _buildCell("images/out.png", "出库"),
+            _buildCell("images/product.png", "商品管理"),
+            _buildCell("images/stock.png", "库存查询"),
+          ],
+        ),
+      ),
+      drawer: _buildDrawer(context),
+    );
+  }
+
+  Widget _buildDrawer(BuildContext context) {
+    return Drawer(
+      child: Column(
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: UserAccountsDrawerHeader(
+                  accountName: Text("${JPda.user.user.name}"),
+                  accountEmail: Text("${JPda.user.user.email}"),
+                ),
+              )
+            ],
+          ),
+          ListTile(
+            leading: Icon(Icons.settings),
+            title: Text("设置"),
+            onTap: () => {},
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.info),
+            title: Text("关于"),
+            onTap: () => {
+                  showDialog(
+                      context: context,
+                      barrierDismissible: true,
+                      builder: (context) {
+                        return new SimpleDialog(
+                          contentPadding: EdgeInsets.all(16),
+                          title: Text("关于"),
+                          children: <Widget>[
+                            Container(child: Text("版本：beta版")),
+                            Container(child: Text("功能：Pda采集器")),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: <Widget>[
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text("退出"),
+                                )
+                              ],
+                            )
+                          ],
+                        );
+                      })
+                },
+          ),
+          Divider(),
+          ListTile(
+              leading: Icon(Icons.exit_to_app),
+              title: Text("重新登陆"),
+              onTap: () async {
+                final result = await Navigator.pushNamed(context, "/login");
+              }),
+          Divider(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNoLogin(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("采集器"),
+          centerTitle: true,
+        ),
+        body: Container(
+            child: Center(
+          child: RaisedButton(
+            onPressed: () {
+              Navigator.pushNamed(context, "/login");
+            },
+            child: Text("请先登陆"),
+          ),
+        )));
+  }
+
+  Widget _buildCell(String imgurl, String text) {
+    return InkWell(
+      onTap: () => {},
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Image.asset(
+            imgurl,
+            fit: BoxFit.cover,
+            width: 80.0,
+            height: 80.0,
+          ),
+          Text(
+            text,
+            style: TextStyle(fontSize: 24.0),
+          ),
+        ],
+      ),
+    );
+  }
+}
