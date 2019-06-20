@@ -48,6 +48,7 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
   }
 
   @override
@@ -83,9 +84,9 @@ class _LoginPageState extends State<LoginPage> {
                         ),
 
                         obscureText: true,
-//                    validator: (val) {
-//                      return val.length < 4 ? "密码长度错误" : null;
-//                    },
+                        validator: (val) {
+                          return val.length < 4 ? "密码长度错误" : null;
+                        },
                         onSaved: (val) {
                           _password = val;
                         },

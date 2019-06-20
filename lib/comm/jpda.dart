@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:jpda/getit/database.dart';
 import 'package:jpda/getit/dio.dart';
 import 'package:jpda/getit/user.dart';
 
@@ -9,6 +10,7 @@ class JPda {
   static initGetIt() {
     getIt.registerSingleton<UserModel>(new UserModelImplementation());
     getIt.registerSingleton<DioModel>(new DioModelIPhone());
+    getIt.registerSingleton<DataBaseModel>(new DataBaseModelImpl());
   }
 
   static UserModel get user {
