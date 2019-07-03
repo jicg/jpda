@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:jpda/comm/func.dart';
 import 'package:jpda/comm/jpda.dart';
 import 'package:jpda/getit/cache.dart';
@@ -20,6 +23,7 @@ abstract class DioModel {
 }
 
 class DioModelIPhone extends DioModel {
+  final DateFormat dateFormat = DateFormat('yyyy-MM-dd hh:mm:ss');
   Dio _dio = new Dio()
     ..options.connectTimeout = 1000 * 10
     ..options.headers["client"] = "mobile"
@@ -54,8 +58,12 @@ class DioModelIPhone extends DioModel {
 
   @override
   Future<Response<Map>> query(String func, Map param) async {
-    Response<Map> resp = await _dio.post<Map>("/html/jpda/validate.jsp",
-        queryParameters: {"func": func, "param": param});
+    if (param == null) {
+      param = {};
+    }
+    param["date"] = "${dateFormat.format(DateTime.now())}";
+    Response<Map> resp = await _dio.post<Map>("/html/jpda/query.jsp",
+        queryParameters: {"func": func, "param": json.encode(param)});
     resp = _handleRespAuth(resp);
     return resp;
   }
@@ -71,7 +79,7 @@ Response<Map> _handleRespNor(Response<Map> resp) {
 }
 
 Response<Map> _handleRespAuth(Response<Map> resp) {
-  return _handleRespAuth(resp);
+  return _handleRespNor(resp);
 }
 
 class WebException implements Exception {
@@ -80,7 +88,7 @@ class WebException implements Exception {
   WebException(this.message);
 
   String toString() {
-    if (message == null) return "WebException";
+    if (message == null) return "网络异常: 未知错误！";
     return "$message";
   }
 }
