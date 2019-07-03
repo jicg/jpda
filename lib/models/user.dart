@@ -1,32 +1,16 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'user.g.dart';
+
+@JsonSerializable(nullable: false)
 class User {
-  String _name = "";
-  String _email = "";
-  String _url = "";
-  String _pwd = "";
+  String name = "";
+  String email = "";
+  String pwd = "";
 
-  User(this._name, this._email, this._url, this._pwd);
+  User(this.name, this.email, this.pwd);
 
-  String get pwd => _pwd;
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
-  set pwd(String value) {
-    _pwd = value;
-  }
-
-  String get url => _url;
-
-  set url(String value) {
-    _url = value;
-  }
-
-  String get email => _email;
-
-  set email(String value) {
-    _email = value;
-  }
-
-  String get name => _name;
-
-  set name(String value) {
-    _name = value;
-  }
+  Map<String, dynamic> toJson() => _$UserToJson(this);
 }

@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'package:convert/convert.dart';
+import 'package:crypto/crypto.dart';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -49,6 +53,43 @@ class UIUtils {
         });
   }
 
+  static Future<T> jpdaShowMessageDialog<T>(BuildContext context,
+      {String title = "",
+      String desc = "",
+      barrierDismissible = true,
+      VoidCallback onTap,
+      VoidCallback onWillPop,
+      List<FlatButton> actions = const []}) {
+    return showDialog<T>(
+      barrierDismissible: barrierDismissible,
+      builder: (context) {
+        return WillPopScope(
+            onWillPop: onWillPop,
+            child: AlertDialog(
+              title: Text(title),
+              content: Text(desc),
+              actions: actions
+                ..add(FlatButton(
+                  child: Text("确定"),
+                  onPressed: onTap,
+                )),
+            )
+//          new SimpleDialog(
+//            title: Text(title),
+//            children: <Widget>[
+//              Text(desc),
+//              FlatButton(
+//                child: Text("确定"),
+//                onPressed: onTap,
+//              )
+//            ],
+//          ),
+            );
+      },
+      context: context,
+    );
+  }
+
   static ToaskError(String msg) {
     Fluttertoast.showToast(
         msg: msg,
@@ -75,8 +116,8 @@ class UIUtils {
 class PermUtils {
   static Future<Map<PermissionGroup, PermissionStatus>>
       requestPermissions() async {
-    return await PermissionHandler()
-        .requestPermissions([PermissionGroup.contacts]);
+    return await PermissionHandler().requestPermissions(
+        [PermissionGroup.contacts, PermissionGroup.storage]);
   }
 
   static Future<PermissionStatus> requestPermission(
@@ -97,4 +138,19 @@ class PermUtils {
   }
 }
 
-class StringUtils {}
+//// md5 加密
+//String generateMd5(String data) {
+//  var content = new Utf8Encoder().convert(data);
+//  var digest = md5.convert(content);
+//  // 这里其实就是 digest.toString()
+//  return hex.encode(digest.bytes);
+//}
+class StringUtils {
+  // md5 加密
+  static String generateMd5(String data) {
+    var content = new Utf8Encoder().convert(data);
+    var digest = md5.convert(content);
+    // 这里其实就是 digest.toString()
+    return hex.encode(digest.bytes);
+  }
+}

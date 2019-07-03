@@ -1,13 +1,13 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:jpda/router/Routes.dart';
 import 'package:jpda/comm/jpda.dart';
-
-import 'getit/dio.dart';
 
 void main() {
   JPda.initGetIt();
   runApp(MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   @override

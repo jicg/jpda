@@ -61,24 +61,26 @@ class _BaseUrlPageState extends State<BaseUrlPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          //JPda.getIt<DioModel>().dio.patchUri(uri)
-          //JPda.getIt<DioModel>().dio.patchUri(uri)
           String url = _prex + _userEtController.text;
+          print(url);
+
           JPda.web.baseUrl = url.trim();
+          print(JPda.web.hasBaseUrl);
+          Navigator.of(context).pop();
+//          if (!JPda.user.isLogin) {
+//            Navigator.pushReplacementNamed(context, '/login');
+//            return;
+//          }
 
-          if (!JPda.user.isLogin) {
-            Navigator.pushReplacementNamed(context, '/login');
-            return;
-          }
-
-          String nextpage = this.widget.arguments == null
-              ? ""
-              : (this.widget.arguments["nextpage"] ?? "");
-          if (nextpage.isNotEmpty) {
-            Navigator.pushReplacementNamed(context, nextpage);
-          } else {
-            Navigator.pop(context);
-          }
+//
+//          String nextpage = this.widget.arguments == null
+//              ? ""
+//              : (this.widget.arguments["nextpage"] ?? "");
+//          if (nextpage.isNotEmpty) {
+//            Navigator.pushReplacementNamed(context, nextpage);
+//          } else {
+//            Navigator.pop(context);
+//          }
         },
         child: Text("保存"),
       ),
