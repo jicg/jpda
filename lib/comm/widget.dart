@@ -186,8 +186,10 @@ class RowRightQueryIconButton extends StatelessWidget {
 
 class InputScanSearch extends StatefulWidget {
   final InputScanSearchCallback query;
+  final String hintText;
 
-  const InputScanSearch({Key key, @required this.query}) : super(key: key);
+  const InputScanSearch({Key key, @required this.query, this.hintText = ""})
+      : super(key: key);
 
   @override
   _InputScanSearchState createState() => _InputScanSearchState();
@@ -238,7 +240,7 @@ class _InputScanSearchState extends State<InputScanSearch> {
             print(t);
           },
           decoration:
-              InputDecoration(border: InputBorder.none, hintText: "查询商品"),
+              InputDecoration(border: InputBorder.none, hintText: widget.hintText),
         ),
         focusNode: _focusNode,
       ),

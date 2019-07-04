@@ -4,6 +4,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
+import 'package:jpda/comm/exception.dart';
 import 'package:jpda/comm/func.dart';
 import 'package:jpda/comm/jpda.dart';
 import 'package:jpda/getit/cache.dart';
@@ -19,7 +20,7 @@ abstract class DioModel {
 
   Future<Response<Map>> login(String email, String pwd);
 
-  Future<Response<Map>> query(String func, Map param);
+  Future<Response<Map>> query(BuildContext context, String func, Map param);
 }
 
 class DioModelIPhone extends DioModel {
@@ -57,14 +58,15 @@ class DioModelIPhone extends DioModel {
   }
 
   @override
-  Future<Response<Map>> query(String func, Map param) async {
+  Future<Response<Map>> query(
+      BuildContext context, String func, Map param) async {
     if (param == null) {
       param = {};
     }
     param["date"] = "${dateFormat.format(DateTime.now())}";
     Response<Map> resp = await _dio.post<Map>("/html/jpda/query.jsp",
         queryParameters: {"func": func, "param": json.encode(param)});
-    resp = _handleRespAuth(resp);
+    resp = _handleRespAuth(context, resp);
     return resp;
   }
 }
@@ -78,17 +80,16 @@ Response<Map> _handleRespNor(Response<Map> resp) {
   return resp;
 }
 
-Response<Map> _handleRespAuth(Response<Map> resp) {
-  return _handleRespNor(resp);
-}
-
-class WebException implements Exception {
-  final message;
-
-  WebException(this.message);
-
-  String toString() {
-    if (message == null) return "网络异常: 未知错误！";
-    return "$message";
+Response<Map> _handleRespAuth(BuildContext context, Response<Map> resp) {
+  Map da = resp.data;
+  int code = da["code"];
+  if (code != 0) {
+    if (code == 1001) {
+      Navigator.pushNamed(context, "/login");
+      throw NotLoginException();
+    } else {
+      throw WebException(resp.data["msg"]);
+    }
   }
+  return resp;
 }

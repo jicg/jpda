@@ -9,6 +9,7 @@ import 'package:jpda/comm/widget.dart';
 import 'package:jpda/getit/cache.dart';
 import 'package:jpda/models/user.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:jpda/comm/exception.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -21,9 +22,7 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     initPerms();
-
     loadData();
-
     super.initState();
   }
 
