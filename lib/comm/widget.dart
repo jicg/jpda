@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:jpda/comm/func.dart';
 
 typedef DateRangeCallback = void Function(String datebeg, String dateend);
+typedef InputScanSearchCallback = void Function(String value);
 
 class DateRangePick extends StatefulWidget {
   final String datebeg;
@@ -26,7 +28,7 @@ class _DateRangePickState extends State<DateRangePick> {
   @override
   void initState() {
     super.initState();
-    if (widget.datebeg != null&&widget.datebeg.isNotEmpty) {
+    if (widget.datebeg != null && widget.datebeg.isNotEmpty) {
       try {
         _dateTimeBeg = dateFormat.parse(widget.datebeg);
       } catch (e) {
@@ -34,7 +36,7 @@ class _DateRangePickState extends State<DateRangePick> {
         UIUtils.ToaskError("$e");
       }
     }
-    if (widget.dateend != null&&widget.dateend.isNotEmpty) {
+    if (widget.dateend != null && widget.dateend.isNotEmpty) {
       try {
         _dateTimeEnd = dateFormat.parse(widget.dateend);
       } catch (e) {
@@ -131,7 +133,6 @@ class _LoadingWidgetState extends State<LoadingWidget> {
   }
 }
 
-
 class RowSessionWithLabel extends StatelessWidget {
   final String label;
   final Widget child;
@@ -180,5 +181,88 @@ class RowRightQueryIconButton extends StatelessWidget {
         IconButton(icon: Icon(Icons.search), onPressed: onTap)
       ],
     );
+  }
+}
+
+class InputScanSearch extends StatefulWidget {
+  final InputScanSearchCallback query;
+
+  const InputScanSearch({Key key, @required this.query}) : super(key: key);
+
+  @override
+  _InputScanSearchState createState() => _InputScanSearchState();
+}
+
+class _InputScanSearchState extends State<InputScanSearch> {
+  TextEditingController _textEditingController;
+  FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _textEditingController = new TextEditingController();
+    _focusNode = new FocusNode();
+  }
+
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            new BoxShadow(
+                blurRadius: 2.0,
+                offset: new Offset(1.0, 1.0),
+                spreadRadius: 1.0)
+          ],
+          border: Border.all(color: Theme.of(context).dividerColor)),
+      child: RawKeyboardListener(
+        onKey: handleKey,
+        child: TextField(
+          maxLines: 1,
+          controller: _textEditingController,
+          autofocus: true,
+          focusNode: _focusNode,
+          textInputAction: TextInputAction.go,
+          keyboardType: TextInputType.multiline,
+          onSubmitted: (_) => widget.query(_textEditingController.text),
+          onChanged: (t) {
+            print(t);
+          },
+          decoration:
+              InputDecoration(border: InputBorder.none, hintText: "查询商品"),
+        ),
+        focusNode: _focusNode,
+      ),
+    );
+  }
+
+  void handleKey(key) {
+    if (Theme.of(context).platform == TargetPlatform.android) {
+      RawKeyEventDataAndroid data = key.data as RawKeyEventDataAndroid;
+      print(data);
+      if (key.runtimeType.toString() == 'RawKeyUpEvent') {
+        if (data.keyCode == 66) {
+          widget.query(_textEditingController.text);
+          //_focusNode.unfocus();
+          FocusScope.of(context).requestFocus(new FocusNode());
+        } else if (data.keyCode == 301) {
+          if (_textEditingController.text.length == 0) {
+            return;
+          }
+          _textEditingController.selection = TextSelection(
+              baseOffset: 0, extentOffset: _textEditingController.text.length);
+          widget.query(_textEditingController.text);
+        }
+      }
+    }
   }
 }

@@ -15,8 +15,6 @@ class QueryProductPage extends StatefulWidget {
 
 class _QueryProductPageState extends State<QueryProductPage> {
   RefreshController _refreshController;
-  TextEditingController _textEditingController;
-  FocusNode _focusNode;
   List<Map> datas = [];
   bool _loading = false;
   int _page = 1;
@@ -27,18 +25,12 @@ class _QueryProductPageState extends State<QueryProductPage> {
   void initState() {
     reLoadData();
     super.initState();
-
     _refreshController = RefreshController(initialRefresh: false);
-    _textEditingController = new TextEditingController();
-
-    _focusNode = new FocusNode();
   }
 
   @override
   void dispose() {
     _refreshController.dispose();
-    _textEditingController.dispose();
-    _focusNode.dispose();
     super.dispose();
   }
 
@@ -93,39 +85,9 @@ class _QueryProductPageState extends State<QueryProductPage> {
     }
   }
 
-  void query() {
-    _query = _textEditingController.text;
+  void query(value) {
+    _query = value;
     reLoadData();
-  }
-
-  void handleKey(key) {
-    print("=========================$key");
-    return;
-
-    if (Theme.of(context).platform == TargetPlatform.android) {
-      RawKeyEventDataAndroid data = key.data as RawKeyEventDataAndroid;
-      print(data);
-      if (key.runtimeType.toString() == 'RawKeyUpEvent') {
-        if (data.keyCode == 66) {
-          query();
-          _focusNode.unfocus();
-        } else if (data.keyCode == 301) {
-          if (_textEditingController.text.length == 0) {
-            return;
-          }
-          _textEditingController.selection = TextSelection(
-              baseOffset: 0, extentOffset: _textEditingController.text.length);
-          query();
-        }
-      }
-
-//                    if (key.runtimeType.toString() == 'RawKeyDownEvent') {
-//                      if (data.keyCode == 301) {
-//                        if (_textEditingController.text.length > 0)
-//                          _textEditingController.text = "";
-//                      }
-//                    }
-    }
   }
 
   @override
@@ -137,35 +99,9 @@ class _QueryProductPageState extends State<QueryProductPage> {
       ),
       body: Column(
         children: <Widget>[
-          Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    new BoxShadow(
-                        blurRadius: 2.0,
-                        offset: new Offset(1.0, 1.0),
-                        spreadRadius: 1.0)
-                  ],
-                  border: Border.all(color: Theme.of(context).dividerColor)),
-              child: RawKeyboardListener(
-                onKey: handleKey,
-                child: TextField(
-                  maxLines: 1,
-                  controller: _textEditingController,
-                  autofocus: true,
-                  focusNode: _focusNode,
-                  textInputAction: TextInputAction.go,
-                  keyboardType:TextInputType.multiline ,
-                  onSubmitted: (_) => query(),
-                  onChanged: (t) {
-                    print(t);
-                  },
-                  decoration: InputDecoration(
-                      border: InputBorder.none, hintText: "查询商品"),
-                ),
-                focusNode: _focusNode,
-              )),
+          InputScanSearch(
+            query: query,
+          ),
           Expanded(
               child:
                   LoadingWidget(loading: _loading, child: _buildQueryData())),
