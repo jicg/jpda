@@ -1,11 +1,9 @@
-import 'dart:convert';
 
 import 'package:get_it/get_it.dart';
 import 'package:jpda/getit/cache.dart';
 import 'package:jpda/getit/database.dart';
 import 'package:jpda/getit/dio.dart';
 import 'package:jpda/getit/user.dart';
-import 'package:jpda/models/user.dart';
 
 class JPda {
   static GetIt getIt = new GetIt();

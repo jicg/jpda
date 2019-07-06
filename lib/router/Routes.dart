@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jpda/pages/comm/query_product.dart';
+import 'package:jpda/pages/comm/query_store.dart';
 import 'package:jpda/pages/login/baseurl.dart';
 import 'package:jpda/pages/product/home.dart';
 import 'package:jpda/pages/stock/home.dart';
@@ -18,6 +19,7 @@ final routes = {
   "/stock/home": (_) => StockHome(),
   "/stock/query": (_) => StockQueryPage(),
   "/comm/query/product": (_) => QueryProductPage(),
+  "/comm/query/store": (_) => QueryStorePage(),
 };
 
 //固定写法

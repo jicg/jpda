@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:jpda/comm/func.dart';
@@ -23,7 +21,7 @@ class _LoginPageState extends State<LoginPage> {
     var _form = _formKey.currentState;
     if (!JPda.web.hasBaseUrl) {
       Navigator.pushNamed(context, "/baseurl");
-      UIUtils.ToaskError("请设置地址！");
+      UIUtils.toaskError("请设置地址！");
       return;
     }
 
@@ -33,12 +31,12 @@ class _LoginPageState extends State<LoginPage> {
       try {
         Response<Map> da = await JPda.web.login(_name, _password);
         JPda.user.login = new User(da.data["name"], _name, _password);
-        UIUtils.ToaskSuccess("登录成功");
+        UIUtils.toaskSuccess("登录成功");
         Navigator.pop(context);
         Navigator.pop(context);
       } catch (err) {
         Navigator.pop(context);
-        UIUtils.ToaskError(err.toString());
+        UIUtils.toaskError(err.toString());
       }
     }
   }
@@ -117,9 +115,9 @@ class _LoginPageState extends State<LoginPage> {
         ));
   }
 
-  Widget _buildUrlDialog(BuildContext context) {
-    return new SimpleDialog(
-      children: <Widget>[new Text("dsafdasdf")],
-    );
-  }
+//  Widget _buildUrlDialog(BuildContext context) {
+//    return new SimpleDialog(
+//      children: <Widget>[new Text("dsafdasdf")],
+//    );
+//  }
 }

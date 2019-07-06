@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:jpda/comm/func.dart';
 import 'package:jpda/comm/jpda.dart';
-import 'package:jpda/comm/widget.dart';
 import 'package:jpda/getit/cache.dart';
 import 'package:jpda/models/user.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:jpda/comm/exception.dart';
+
+import 'comm/weigets/loading_widget.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -37,7 +37,7 @@ class _MainPageState extends State<MainPage> {
         JPda.user.login = JPda.user.user;
       }
     } catch (e) {
-      UIUtils.ToaskError("$e");
+      UIUtils.toaskError("$e");
     } finally {
       setState(() {
         _loading = false;
@@ -112,7 +112,7 @@ class _MainPageState extends State<MainPage> {
           ListTile(
             leading: Icon(Icons.info),
             title: Text("关于"),
-            onTap: () => {
+            onTap: (){
                   showDialog(
                       context: context,
                       barrierDismissible: true,
@@ -136,7 +136,7 @@ class _MainPageState extends State<MainPage> {
                             )
                           ],
                         );
-                      })
+                      });
                 },
           ),
           Divider(),
@@ -144,7 +144,7 @@ class _MainPageState extends State<MainPage> {
               leading: Icon(Icons.exit_to_app),
               title: Text("重新登陆"),
               onTap: () async {
-                final result = await Navigator.pushNamed(context, "/login");
+                 await Navigator.pushNamed(context, "/login");
               }),
           Divider(),
         ],
@@ -213,7 +213,7 @@ class _MainPageState extends State<MainPage> {
                 child: Text("系统权限"),
                 onPressed: () async {
                   if (!await PermUtils.openAppSettings()) {
-                    UIUtils.ToaskError("系统应用权限，打开失败");
+                    UIUtils.toaskError("系统应用权限，打开失败");
                   }
                 },
               )

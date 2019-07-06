@@ -90,7 +90,7 @@ class UIUtils {
     );
   }
 
-  static ToaskError(String msg) {
+  static toaskError(String msg) {
     Fluttertoast.showToast(
         msg: msg,
         toastLength: Toast.LENGTH_SHORT,
@@ -101,7 +101,7 @@ class UIUtils {
         fontSize: 16.0);
   }
 
-  static ToaskSuccess(String msg) {
+  static toaskSuccess(String msg) {
     Fluttertoast.showToast(
         msg: msg,
         toastLength: Toast.LENGTH_SHORT,

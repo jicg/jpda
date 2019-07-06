@@ -4,10 +4,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:jpda/comm/func.dart';
 import 'package:jpda/comm/jpda.dart';
-import 'package:jpda/comm/widget.dart';
+import 'package:jpda/pages/comm/weigets/search_inputfeild.dart';
+import 'package:jpda/pages/comm/weigets/loading_widget.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:jpda/comm/exception.dart';
 
 class QueryBaseWidget extends StatefulWidget {
   final QueryBeanDelegate delegate;
@@ -20,8 +20,13 @@ class QueryBaseWidget extends StatefulWidget {
 
 class _QueryBaseWidgetState extends State<QueryBaseWidget> {
   RefreshController _refreshController;
-  List<Map> datas = [];
-  List<Map> selDatas = [];
+
+//  List<Map> datas = [];
+  Map<int, Map> datas = {};
+  List<int> keys = [];
+
+//  Map<int, Map> selDatas = {};
+  List<int> selKeys = [];
   bool _loading = false;
   int _page = 1;
   String _query = "";
@@ -42,16 +47,21 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
   Future<void> reLoadData() async {
     try {
       _loading = true;
-      datas = [];
       _page = 1;
+      keys=[];
       Response<Map> da = await widget.delegate.query(context, _query, _page);
       List dd = json.decode(da.data["data"]);
-      List<Map> dm = dd.map((f) {
-        return f as Map;
-      }).toList();
-      if (dm.length > 0) {
+      dd.forEach((f) {
+        Map ff = f as Map;
+        int id = ff["id"] as int;
+        if (!this.keys.contains(id)) {
+          this.keys.add(id);
+        }
+        datas[id] = ff;
+        //return ff;
+      }); //.toList();
+      if (dd.length > 0) {
         _page++;
-        datas.addAll(dm);
       }
     }
 //    on NotLoginException {
@@ -60,30 +70,34 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
 //    }
 
     catch (e) {
-      UIUtils.ToaskError("$e");
+      UIUtils.toaskError("$e");
     }
     setState(() {
       _loading = false;
     });
   }
 
-  Map getParam() {}
 
   Future<void> loadMoreData() async {
     try {
       Response<Map> da = await widget.delegate.query(context, _query, _page);
       List dd = json.decode(da.data["data"]);
-      List<Map> dm = dd.map((f) {
-        return f as Map;
-      }).toList();
-      if (dm.length > 0) {
+      dd.forEach((f) {
+        Map ff = f as Map;
+        int id = ff["id"] as int;
+        if (!this.keys.contains(id)) {
+          this.keys.add(id);
+        }
+        datas[id] = ff;
+      });
+      if (dd.length > 0) {
         _page++;
-        datas.addAll(dm);
+//        datas.addAll(dm);
         setState(() {
           _refreshController.loadComplete();
         });
       } else {
-        UIUtils.ToaskError("已经没有数据");
+        UIUtils.toaskError("已经没有数据");
         setState(() {
           _refreshController.loadNoData();
         });
@@ -97,7 +111,7 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
 //      Navigator.of(context).pushNamed("/login");
 //    }
     catch (e) {
-      UIUtils.ToaskError("$e");
+      UIUtils.toaskError("$e");
       setState(() {
         _refreshController.loadFailed();
       });
@@ -145,9 +159,8 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
                                       InkWell(
                                         onTap: () {
                                           state(() {
-                                            selDatas.clear();
+                                            selKeys.clear();
                                           });
-
                                         },
                                         child: Align(
                                             alignment: Alignment.centerRight,
@@ -163,11 +176,12 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
                                 Expanded(
                                   child: ListView.separated(
                                       itemBuilder: (context, i) {
-                                        final Map map = selDatas[i];
+                                        final int id = selKeys[i];
+                                        final Map map = datas[id];
                                         return widget.delegate
                                             .buildBootItem(context, map, () {
                                           state(() {
-                                            selDatas.remove(map);
+                                            selKeys.remove(id);
                                           });
                                         });
                                       },
@@ -176,7 +190,7 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
                                           height: 0,
                                         );
                                       },
-                                      itemCount: selDatas.length),
+                                      itemCount: selKeys.length),
                                 ),
                               ],
                             ),
@@ -193,7 +207,7 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
                 padding:
                     const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
                 child: Text(
-                  "${selDatas.length}",
+                  "${selKeys.length}",
                   style: TextStyle(fontSize: 18),
                 ),
               ),
@@ -203,7 +217,7 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
       ),
       body: Column(
         children: <Widget>[
-          InputScanSearch(
+          SearchInputFeild(
             hintText: widget.delegate.hintText,
             query: query,
           ),
@@ -241,7 +255,9 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
                 Expanded(
                   child: RaisedButton.icon(
                       onPressed: () {
-                        Navigator.of(context).pop(selDatas);
+                        Navigator.of(context).pop(selKeys.map((f) {
+                          return datas[f];
+                        }).toList());
                       },
                       color: Colors.blue,
                       icon: Icon(Icons.done, color: Colors.white),
@@ -262,7 +278,7 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
   }
 
   Widget _buildQueryData() {
-    if (datas.length == 0) {
+    if (keys.length == 0) {
       return new Container(
         child: Center(
           child: Text("没有数据"),
@@ -273,14 +289,15 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
       controller: _refreshController,
       child: ListView.separated(
         itemBuilder: (context, i) {
-          final Map map = datas[i];
+          final int id = keys[i];
+          final Map map = datas[id];
           return widget.delegate
-              .buildItem(context, map, this.selDatas.contains(map), () {
+              .buildItem(context, map, this.selKeys.contains(id), () {
             setState(() {
-              if (this.selDatas.contains(map)) {
-                this.selDatas.remove(map);
+              if (this.selKeys.contains(id)) {
+                this.selKeys.remove(id);
               } else {
-                this.selDatas.add(map);
+                this.selKeys.add(id);
               }
             });
           });
@@ -290,7 +307,7 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
             height: 0,
           );
         },
-        itemCount: datas.length,
+        itemCount: keys.length,
       ),
       enablePullDown: false,
       enablePullUp: true,

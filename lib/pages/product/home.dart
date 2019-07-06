@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:jpda/comm/jpda.dart';
 
 class ProductHome extends StatefulWidget {
   @override

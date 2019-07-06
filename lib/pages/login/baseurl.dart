@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:jpda/comm/jpda.dart';
 
+// ignore: must_be_immutable
 class BaseUrlPage extends StatefulWidget {
   Map<String, String> arguments;
 

@@ -1,13 +1,8 @@
-import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:jpda/comm/func.dart';
 import 'package:jpda/comm/jpda.dart';
-import 'package:jpda/comm/widget.dart';
-import 'package:jpda/pages/comm/query_comm.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:jpda/pages/comm/base/query_comm.dart';
 
 class QueryProductPage extends StatelessWidget {
   @override

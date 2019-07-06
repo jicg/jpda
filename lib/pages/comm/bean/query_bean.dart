@@ -1,6 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
-part 'query_bean.g.dart';
+part 'package:jpda/pages/comm/bean/query_bean.g.dart';
 
 @JsonSerializable(nullable: false)
 class QueryBean {
