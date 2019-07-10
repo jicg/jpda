@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:jpda/comm/jpda.dart';
-import 'package:jpda/pages/comm/base/query_comm.dart';
+import 'package:jpda/pages/comm/base/query_search.dart';
 
 class QueryStorePage extends StatefulWidget {
   @override

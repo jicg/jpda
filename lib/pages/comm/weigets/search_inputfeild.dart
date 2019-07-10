@@ -52,7 +52,7 @@ class _SearchInputFeildState extends State<SearchInputFeild> {
           controller: _textEditingController,
           autofocus: true,
           focusNode: _focusNode,
-          textInputAction: TextInputAction.go,
+          textInputAction: TextInputAction.search,
           keyboardType: TextInputType.multiline,
           onSubmitted: (_) => widget.query(_textEditingController.text),
           onChanged: (t) {

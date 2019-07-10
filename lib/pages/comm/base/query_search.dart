@@ -31,6 +31,8 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
   int _page = 1;
   String _query = "";
 
+  bool _showBottomBtns = true;
+
   @override
   void initState() {
     reLoadData();
@@ -48,7 +50,7 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
     try {
       _loading = true;
       _page = 1;
-      keys=[];
+      keys = [];
       Response<Map> da = await widget.delegate.query(context, _query, _page);
       List dd = json.decode(da.data["data"]);
       dd.forEach((f) {
@@ -76,7 +78,6 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
       _loading = false;
     });
   }
-
 
   Future<void> loadMoreData() async {
     try {
@@ -123,6 +124,137 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
     reLoadData();
   }
 
+  void _showModalBottomSheet(BuildContext context) {
+//    setState(() {
+//      _showBottomBtns = false;
+//    });
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, state) {
+              return InkWell(
+                onTap: () {},
+                child: Container(
+                  color: Colors.white,
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        color: Colors.blue,
+                        child: Stack(
+                          children: <Widget>[
+                            Align(
+                                alignment: Alignment.centerLeft,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    "已经选择",
+                                    style: TextStyle(
+                                        fontSize: 18, color: Colors.white),
+                                  ),
+                                )),
+                            Align(
+                                alignment: Alignment.centerRight,
+                                child: InkWell(
+                                  onTap: () {
+                                    state(() {
+                                      selKeys.clear();
+                                    });
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      "清除",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                )),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: ListView.separated(
+                            itemBuilder: (context, i) {
+                              final int id = selKeys[i];
+                              final Map map = datas[id];
+                              return widget.delegate.buildBootItem(context, map,
+                                  () {
+                                state(() {
+                                  selKeys.remove(id);
+                                });
+                              });
+                            },
+                            separatorBuilder: (context, i) {
+                              return new Divider(
+                                height: 0,
+                              );
+                            },
+                            itemCount: selKeys.length),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        }).whenComplete(() {
+      setState(() {
+//        _showBottomBtns = true;
+      });
+    });
+  }
+
+  Widget _buildBottomBtns(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(0),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            new BoxShadow(
+                blurRadius: 20.0,
+                offset: new Offset(1.0, 3.0),
+                spreadRadius: 1.0)
+          ],
+          border: Border.all(color: Theme.of(context).dividerColor)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          SizedBox(
+            width: 10,
+          ),
+          Expanded(
+            child: RaisedButton.icon(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: Icon(Icons.cancel),
+                label: Text("取消")),
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          Expanded(
+            child: RaisedButton.icon(
+                onPressed: () {
+                  Navigator.of(context).pop(selKeys.map((f) {
+                    return datas[f];
+                  }).toList());
+                },
+                color: Colors.blue,
+                icon: Icon(Icons.done, color: Colors.white),
+                label: Text(
+                  "确定",
+                  style: TextStyle(color: Colors.white),
+                )),
+          ),
+          SizedBox(
+            width: 10,
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -131,77 +263,7 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
         centerTitle: true,
         actions: <Widget>[
           InkWell(
-            onTap: () {
-              showModalBottomSheet(
-                  context: context,
-                  builder: (context) {
-                    return StatefulBuilder(
-                      builder: (BuildContext context, state) {
-                        return InkWell(
-                          onTap: () {},
-                          child: Container(
-                            color: Colors.white,
-                            child: Column(
-                              children: <Widget>[
-                                Container(
-                                  color: Colors.blue,
-                                  padding: EdgeInsets.all(8),
-                                  child: Stack(
-                                    children: <Widget>[
-                                      Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: Text(
-                                            "已经选择",
-                                            style: TextStyle(
-                                                fontSize: 18,
-                                                color: Colors.white),
-                                          )),
-                                      InkWell(
-                                        onTap: () {
-                                          state(() {
-                                            selKeys.clear();
-                                          });
-                                        },
-                                        child: Align(
-                                            alignment: Alignment.centerRight,
-                                            child: Text(
-                                              "清除",
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            )),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  child: ListView.separated(
-                                      itemBuilder: (context, i) {
-                                        final int id = selKeys[i];
-                                        final Map map = datas[id];
-                                        return widget.delegate
-                                            .buildBootItem(context, map, () {
-                                          state(() {
-                                            selKeys.remove(id);
-                                          });
-                                        });
-                                      },
-                                      separatorBuilder: (context, i) {
-                                        return new Divider(
-                                          height: 0,
-                                        );
-                                      },
-                                      itemCount: selKeys.length),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  }).whenComplete(() {
-                setState(() {});
-              });
-            },
+            onTap: () => _showModalBottomSheet(context),
             child: Center(
               child: Padding(
                 padding:
@@ -224,54 +286,8 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
           Expanded(
               child:
                   LoadingWidget(loading: _loading, child: _buildQueryData())),
-          Container(
-            padding: EdgeInsets.all(0),
-            decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  new BoxShadow(
-                      blurRadius: 20.0,
-                      offset: new Offset(1.0, 3.0),
-                      spreadRadius: 1.0)
-                ],
-                border: Border.all(color: Theme.of(context).dividerColor)),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                  child: RaisedButton.icon(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      icon: Icon(Icons.cancel),
-                      label: Text("取消")),
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                  child: RaisedButton.icon(
-                      onPressed: () {
-                        Navigator.of(context).pop(selKeys.map((f) {
-                          return datas[f];
-                        }).toList());
-                      },
-                      color: Colors.blue,
-                      icon: Icon(Icons.done, color: Colors.white),
-                      label: Text(
-                        "确定",
-                        style: TextStyle(color: Colors.white),
-                      )),
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-              ],
-            ),
-          )
+          Visibility(
+              visible: _showBottomBtns, child: _buildBottomBtns(context)),
         ],
       ),
     );

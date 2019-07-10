@@ -2,7 +2,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:jpda/comm/jpda.dart';
-import 'package:jpda/pages/comm/base/query_comm.dart';
+import 'package:jpda/pages/comm/base/query_search.dart';
 
 class QueryProductPage extends StatelessWidget {
   @override
@@ -21,11 +21,9 @@ class QueryProductDelegate extends QueryBeanDelegate {
   }
 
   @override
-  // TODO: implement hintText
   String get hintText => "条码/款号编号/款号名称";
 
   @override
-  // TODO: implement title
   String get title => "商品查询";
 }
 //class QueryProductPage extends StatefulWidget {

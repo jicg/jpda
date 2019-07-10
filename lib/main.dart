@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:jpda/router/Routes.dart';
+import 'package:jpda/pages/comm/base/query_where.dart';
+import 'package:jpda/pages/comm/query_product.dart';
+import 'package:jpda/pages/comm/query_store.dart';
+import 'package:jpda/pages/home.dart';
+import 'package:jpda/pages/login/baseurl.dart';
+import 'package:jpda/pages/login/login.dart';
+import 'package:jpda/pages/pandian/home.dart';
+import 'package:jpda/pages/product/home.dart';
+import 'package:jpda/pages/stock/home.dart';
+import 'package:jpda/pages/welcome/first.dart';
 import 'package:jpda/comm/jpda.dart';
 
 void main() {
@@ -10,7 +19,6 @@ void main() {
     runApp(new MyApp());
   });
 }
-
 
 class MyApp extends StatelessWidget {
   @override
@@ -24,7 +32,20 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       initialRoute: "/",
-      onGenerateRoute: onGenerateRoute,
+      routes: routes,
     );
   }
 }
+
+final routes = {
+  "/first": (context) => FirstPage(),
+  "/login": (context) => LoginPage(),
+  "/": (context) => MainPage(),
+  "/baseurl": (context) => BaseUrlPage(),
+  "/product/home": (_) => ProductHome(),
+  "/pandian/home": (_) => PanDianPage(),
+  "/stock/home": (_) => StockHome(),
+  "/stock/query": (_) => QueryPage(),
+  "/comm/query/product": (_) => QueryProductPage(),
+  "/comm/query/store": (_) => QueryStorePage(),
+};

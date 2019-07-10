@@ -4,9 +4,8 @@ import 'package:jpda/comm/jpda.dart';
 
 // ignore: must_be_immutable
 class BaseUrlPage extends StatefulWidget {
-  Map<String, String> arguments;
 
-  BaseUrlPage(this.arguments);
+  BaseUrlPage();
 
   @override
   _BaseUrlPageState createState() => _BaseUrlPageState();

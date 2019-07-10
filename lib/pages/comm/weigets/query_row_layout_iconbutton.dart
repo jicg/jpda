@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 class QueryRowLayoutIconButton extends StatelessWidget {
   final Widget child;
   final VoidCallback onTap;
+  final IconData iconData;
 
-  const QueryRowLayoutIconButton({Key key, this.onTap, this.child})
+  const QueryRowLayoutIconButton(
+      {Key key, this.onTap, this.child, this.iconData = Icons.search})
       : super(key: key);
 
   @override
@@ -14,7 +16,7 @@ class QueryRowLayoutIconButton extends StatelessWidget {
         Expanded(
           child: child,
         ),
-        IconButton(icon: Icon(Icons.search), onPressed: onTap)
+        IconButton(icon: Icon(iconData), onPressed: onTap)
       ],
     );
   }

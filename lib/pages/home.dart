@@ -75,7 +75,9 @@ class _MainPageState extends State<MainPage> {
       child: GridView.count(
         crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
         children: <Widget>[
-          _buildCell("images/pandian.png", "盘点", () {}),
+          _buildCell("images/pandian.png", "盘点", () {
+            Navigator.of(context).pushNamed("/pandian/home");
+          }),
 //          _buildCell("images/in.png", "入库", () {}),
 //          _buildCell("images/out.png", "出库", () {}),
 //          _buildCell("images/product.png", "商品管理", () {
