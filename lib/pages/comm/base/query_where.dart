@@ -17,7 +17,7 @@ class _QueryPageState extends State<QueryPage> {
 
   @override
   void initState() {
-    Future.delayed(Duration.zero,(){
+    Future.delayed(Duration.zero, () {
       setState(() {
         data = ModalRoute.of(context).settings.arguments;
         beforeBuild();
@@ -29,7 +29,6 @@ class _QueryPageState extends State<QueryPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
   }
 
   @override
@@ -243,6 +242,8 @@ class _QueryItemBuildBean {
 class QueryPageDataBuilder {
   static const String QUERY_ITEM_INPUT_QUERY = "text_query";
   static const String QUERY_ITEM_INPUT = "text";
+  static const String QUERY_ITEM_DATE_PICKER = "date_picker";
+  static const String QUERY_ITEM_QTY_RANGE = "qty_range";
   List<_QueryItemBuildBean> _vdatas = [];
 
   void add(String key, String label, String type, {Map data}) {

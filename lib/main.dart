@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:jpda/pages/comm/base/query_where.dart';
 import 'package:jpda/pages/comm/query_product.dart';
+import 'package:jpda/pages/comm/query_sku.dart';
 import 'package:jpda/pages/comm/query_store.dart';
 import 'package:jpda/pages/home.dart';
 import 'package:jpda/pages/login/baseurl.dart';
@@ -44,8 +45,10 @@ final routes = {
   "/baseurl": (context) => BaseUrlPage(),
   "/product/home": (_) => ProductHome(),
   "/pandian/home": (_) => PanDianPage(),
+  "/pandian/query": (_) => QueryPage(),
   "/stock/home": (_) => StockHome(),
   "/stock/query": (_) => QueryPage(),
   "/comm/query/product": (_) => QueryProductPage(),
   "/comm/query/store": (_) => QueryStorePage(),
+  "/comm/query/sku": (_) => QuerySkuPage(),
 };

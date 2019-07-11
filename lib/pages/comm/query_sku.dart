@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:jpda/comm/jpda.dart';
 import 'package:jpda/pages/comm/base/query_search.dart';
 
-class QueryProductPage extends StatelessWidget {
+class QuerySkuPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return QueryBaseWidget(
@@ -17,12 +17,12 @@ class QueryProductDelegate extends QueryBeanDelegate {
   @override
   Future<Response<Map>> query(BuildContext context,String query, int page) {
     return JPda.web
-        .query(context,"jpda_comm\$query_product", {"page": page, "query": query});
+        .query(context,"jpda_comm\$query_sku", {"page": page, "query": query});
   }
 
   @override
-  String get hintText => "款号编号/款号名称";
+  String get hintText => "条码/款号编号/款号名称";
 
   @override
-  String get title => "款号查询";
+  String get title => "条码查询";
 }

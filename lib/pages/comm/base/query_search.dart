@@ -104,13 +104,6 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
         });
       }
     }
-//    on NotLoginException {
-//      UIUtils.ToaskError("请先登录");
-//      setState(() {
-//        _refreshController.loadFailed();
-//      });
-//      Navigator.of(context).pushNamed("/login");
-//    }
     catch (e) {
       UIUtils.toaskError("$e");
       setState(() {
