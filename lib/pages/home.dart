@@ -32,7 +32,7 @@ class _MainPageState extends State<MainPage> {
       String str = await JPda.cache.get(CacheKeys.App_User);
       Map<String, dynamic> user = json.decode(str);
       JPda.user.init = User.fromJson(user);
-      if ((JPda.user.user?.email ?? "").isNotEmpty) {
+      if ((JPda.web.hasBaseUrl && (JPda.user.user?.email ?? "").isNotEmpty)) {
         await JPda.web.login(JPda.user.user.email, JPda.user.user.pwd);
         JPda.user.login = JPda.user.user;
       }
@@ -114,39 +114,39 @@ class _MainPageState extends State<MainPage> {
           ListTile(
             leading: Icon(Icons.info),
             title: Text("关于"),
-            onTap: (){
-                  showDialog(
-                      context: context,
-                      barrierDismissible: true,
-                      builder: (context) {
-                        return new SimpleDialog(
-                          contentPadding: EdgeInsets.all(16),
-                          title: Text("关于"),
+            onTap: () {
+              showDialog(
+                  context: context,
+                  barrierDismissible: true,
+                  builder: (context) {
+                    return new SimpleDialog(
+                      contentPadding: EdgeInsets.all(16),
+                      title: Text("关于"),
+                      children: <Widget>[
+                        Container(child: Text("版本：beta版")),
+                        Container(child: Text("功能：Pda采集器")),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
                           children: <Widget>[
-                            Container(child: Text("版本：beta版")),
-                            Container(child: Text("功能：Pda采集器")),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: <Widget>[
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Text("退出"),
-                                )
-                              ],
+                            InkWell(
+                              onTap: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text("退出"),
                             )
                           ],
-                        );
-                      });
-                },
+                        )
+                      ],
+                    );
+                  });
+            },
           ),
           Divider(),
           ListTile(
               leading: Icon(Icons.exit_to_app),
               title: Text("重新登陆"),
               onTap: () async {
-                 await Navigator.pushNamed(context, "/login");
+                await Navigator.pushNamed(context, "/login");
               }),
           Divider(),
         ],

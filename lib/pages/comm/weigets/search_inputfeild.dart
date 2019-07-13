@@ -53,11 +53,8 @@ class _SearchInputFeildState extends State<SearchInputFeild> {
           autofocus: true,
           focusNode: _focusNode,
           textInputAction: TextInputAction.search,
-          keyboardType: TextInputType.multiline,
+//          keyboardType: TextInputType.multiline,
           onSubmitted: (_) => widget.query(_textEditingController.text),
-          onChanged: (t) {
-            print(t);
-          },
           decoration:
           InputDecoration(border: InputBorder.none, hintText: widget.hintText),
         ),

@@ -118,12 +118,13 @@ class _StockHomeState extends State<StockHome> {
                 if (rets == null) {
                   return;
                 }
-                var m = rets as Map;
-                Map p = {};
-                p[ProductKey] = formatDataValue(rets, ProductKey);
-                p[StoreKey] = formatDataValue(rets, StoreKey);
-                p[SkuKey] = formatDataValue(rets, SkuKey);
-                _param = p;
+//                Map p = {};
+//                p[ProductKey] =
+//                    QueryPageDataBuilder.formatDataValue(rets, ProductKey);
+//                p[StoreKey] =
+//                    QueryPageDataBuilder.formatDataValue(rets, StoreKey);
+//                p[SkuKey] = QueryPageDataBuilder.formatDataValue(rets, SkuKey);
+                _param = rets as Map;
                 reLoadData();
               },
               tooltip: "查询",
@@ -165,17 +166,6 @@ class _StockHomeState extends State<StockHome> {
         await loadMoreData();
       },
     );
-  }
-
-
-  Map formatDataValue(Map rets, String key) {
-    Map p = {};
-    if (rets[key] is List) {
-      p["list"] = rets[key];
-    } else {
-      p["text"] = rets[key];
-    }
-    return p;
   }
 }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jpda/pages/comm/weigets/date_range_pick.dart';
 import 'package:jpda/pages/comm/weigets/query_row_layout_iconbutton.dart';
 import 'package:jpda/pages/comm/weigets/query_row_layout_label.dart';
 
@@ -58,9 +59,6 @@ class _QueryPageState extends State<QueryPage> {
   }
 
   Future<void> beforeBuild() async {
-//    _textFeilds.forEach((f) => f.dispose());
-//    _widget_funcs = [];
-//    _textFeilds=[];
     data._vdatas.forEach((d) {
       switch (d.type) {
         case QueryPageDataBuilder.QUERY_ITEM_INPUT_QUERY:
@@ -68,14 +66,77 @@ class _QueryPageState extends State<QueryPage> {
           break;
         case QueryPageDataBuilder.QUERY_ITEM_INPUT:
           _widget_funcs.add(_buildText(d.key, d.label));
+          break;
+        case QueryPageDataBuilder.QUERY_ITEM_DATE_RANGE_PICKER:
+          _widget_funcs.add(_buildDateRangePicker(d.key, d.label));
+          break;
+        case QueryPageDataBuilder.QUERY_ITEM_SELECT:
+          _widget_funcs.add(
+              _buildSelect(d.key, d.label, d.data["items"], d.data["default"]));
+          break;
+        case QueryPageDataBuilder.QUERY_ITEM_QTY_RANGE:
+          _widget_funcs.add(_buildQtyRange(d.key, d.label));
+          break;
       }
     });
     setState(() {});
   }
 
+  BuildFunc _buildQtyRange(String key, String label) {
+    return () => QueryRowLayoutLabel(
+          label: label,
+          child: new Container(
+            child: Center(
+              child: Text("还没实现"),
+            ),
+          ),
+        );
+  }
+
+  BuildFunc _buildDateRangePicker(String key, String label) {
+    return () => QueryRowLayoutLabel(
+          label: label,
+          child: DateRangePick(
+            onChange: (beg, end) {
+              rets[key] = {"datebeg": beg, "dateend": end};
+            },
+          ),
+        );
+  }
+
+  BuildFunc _buildSelect(String key, String label, List items, dynamic def) {
+    final List<DropdownMenuItem<dynamic>> ditems = [];
+    items.forEach((f) {
+      var m = f as Map;
+      ditems.add(DropdownMenuItem(
+        child: Text(m['name']),
+        value: m['val'],
+      ));
+    });
+    if (def != null) {
+      rets[key] = def;
+    }
+    return () => QueryRowLayoutLabel(
+          label: label,
+          child: new DropdownButton(
+            isExpanded: true,
+            onChanged: (value) {
+              rets[key] = value;
+              setState(() {});
+            },
+            underline: new Container(),
+            value: rets[key],
+            items: ditems,
+          ),
+        );
+  }
+
   BuildFunc _buildText(String key, String label) {
-    final QueryPageTextFeildBean textFeildBean =
-        QueryPageTextFeildBean(key, TextEditingController(), FocusNode());
+    final QueryPageTextFeildBean textFeildBean = QueryPageTextFeildBean(
+        key,
+        TextEditingController(),
+        FocusNode(),
+        QueryPageDataBuilder.QUERY_ITEM_INPUT);
     _textFeilds.add(textFeildBean);
     final int index = _textFeilds.indexOf(textFeildBean);
     return () => QueryRowLayoutLabel(
@@ -103,8 +164,11 @@ class _QueryPageState extends State<QueryPage> {
   }
 
   BuildFunc _buildTextQuery(String key, String label, String path) {
-    final QueryPageTextFeildBean textFeildBean =
-        QueryPageTextFeildBean(key, TextEditingController(), FocusNode());
+    final QueryPageTextFeildBean textFeildBean = QueryPageTextFeildBean(
+        key,
+        TextEditingController(),
+        FocusNode(),
+        QueryPageDataBuilder.QUERY_ITEM_INPUT_QUERY);
     _textFeilds.add(textFeildBean);
     final int index = _textFeilds.indexOf(textFeildBean);
     //   记住，此次 的所有逻辑，是首次初始化的逻辑。
@@ -189,6 +253,12 @@ class _QueryPageState extends State<QueryPage> {
                     if (!rets.containsKey(f.key)) {
                       rets[f.key] = f.controller.text;
                     }
+                    if (QueryPageDataBuilder.QUERY_ITEM_INPUT_QUERY
+                            .compareTo(f.type) ==
+                        0) {
+                      rets[f.key] =
+                          QueryPageDataBuilder.formatDataValue(rets, f.key);
+                    }
                   });
                   Navigator.pop(context, rets);
                 },
@@ -219,12 +289,12 @@ typedef BuildFunc = Widget Function();
 class QueryPageTextFeildBean {
   final String key;
   final TextEditingController controller;
-
   final FocusNode focusNode;
+  final String type;
 
   bool enable = true;
 
-  QueryPageTextFeildBean(this.key, this.controller, this.focusNode);
+  QueryPageTextFeildBean(this.key, this.controller, this.focusNode, this.type);
 
   void dispose() {
     controller.dispose();
@@ -242,8 +312,9 @@ class _QueryItemBuildBean {
 class QueryPageDataBuilder {
   static const String QUERY_ITEM_INPUT_QUERY = "text_query";
   static const String QUERY_ITEM_INPUT = "text";
-  static const String QUERY_ITEM_DATE_PICKER = "date_picker";
+  static const String QUERY_ITEM_DATE_RANGE_PICKER = "date_range_picker";
   static const String QUERY_ITEM_QTY_RANGE = "qty_range";
+  static const String QUERY_ITEM_SELECT = "select";
   List<_QueryItemBuildBean> _vdatas = [];
 
   void add(String key, String label, String type, {Map data}) {
@@ -253,5 +324,17 @@ class QueryPageDataBuilder {
       ..type = type
       ..data = data;
     _vdatas.add(bean);
+  }
+
+  static Map formatDataValue(Map rets, String key) {
+    Map p = {};
+    if (rets[key] is List) {
+      p["list"] = rets[key];
+    } else if (rets[key] is Map) {
+      p["json"] = rets[key];
+    } else {
+      p["text"] = rets[key];
+    }
+    return p;
   }
 }
