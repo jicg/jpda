@@ -20,6 +20,7 @@ class QueryBaseWidget extends StatefulWidget {
 
 class _QueryBaseWidgetState extends State<QueryBaseWidget> {
   RefreshController _refreshController;
+  bool _single = false;
   Map _arguments = {};
 
 //  List<Map> datas = [];
@@ -52,7 +53,10 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
     Future.delayed(Duration.zero, () {
       setState(() {
         _arguments = ModalRoute.of(context).settings.arguments;
-        _showBottomBtns = !(_arguments['single'] == true);
+        if(_arguments !=null) {
+          _single = _arguments['single'] == true;
+          _showBottomBtns = !_single;
+        }
       });
     });
   }
@@ -264,8 +268,7 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
       appBar: AppBar(
         title: Text(widget.delegate.title),
         centerTitle: true,
-        actions: _arguments['single'] == true
-            ? []
+        actions: _single ? []
             : <Widget>[
                 InkWell(
                   onTap: () => _showModalBottomSheet(context),
@@ -315,7 +318,7 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
           return widget.delegate
               .buildItem(context, map, this.selKeys.contains(id), () {
             setState(() {
-              if (_arguments['single'] == true) {
+              if (_single) {
                 Navigator.pop(context, map);
                 return;
               }
