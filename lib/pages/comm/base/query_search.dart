@@ -20,6 +20,7 @@ class QueryBaseWidget extends StatefulWidget {
 
 class _QueryBaseWidgetState extends State<QueryBaseWidget> {
   RefreshController _refreshController;
+  Map _arguments = {};
 
 //  List<Map> datas = [];
   Map<int, Map> datas = {};
@@ -35,6 +36,7 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
 
   @override
   void initState() {
+    loadParams();
     reLoadData();
     super.initState();
     _refreshController = RefreshController(initialRefresh: false);
@@ -44,6 +46,15 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
   void dispose() {
     _refreshController.dispose();
     super.dispose();
+  }
+
+  void loadParams() {
+    Future.delayed(Duration.zero, () {
+      setState(() {
+        _arguments = ModalRoute.of(context).settings.arguments;
+        _showBottomBtns = !(_arguments['single'] == true);
+      });
+    });
   }
 
   Future<void> reLoadData() async {
@@ -103,8 +114,7 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
           _refreshController.loadNoData();
         });
       }
-    }
-    catch (e) {
+    } catch (e) {
       UIUtils.toaskError("$e");
       setState(() {
         _refreshController.loadFailed();
@@ -254,21 +264,23 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
       appBar: AppBar(
         title: Text(widget.delegate.title),
         centerTitle: true,
-        actions: <Widget>[
-          InkWell(
-            onTap: () => _showModalBottomSheet(context),
-            child: Center(
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
-                child: Text(
-                  "${selKeys.length}",
-                  style: TextStyle(fontSize: 18),
-                ),
-              ),
-            ),
-          )
-        ],
+        actions: _arguments['single'] == true
+            ? []
+            : <Widget>[
+                InkWell(
+                  onTap: () => _showModalBottomSheet(context),
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8.0, horizontal: 16),
+                      child: Text(
+                        "${selKeys.length}",
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ),
+                  ),
+                )
+              ],
       ),
       body: Column(
         children: <Widget>[
@@ -303,6 +315,10 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
           return widget.delegate
               .buildItem(context, map, this.selKeys.contains(id), () {
             setState(() {
+              if (_arguments['single'] == true) {
+                Navigator.pop(context, map);
+                return;
+              }
               if (this.selKeys.contains(id)) {
                 this.selKeys.remove(id);
               } else {

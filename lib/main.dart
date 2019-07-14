@@ -7,7 +7,9 @@ import 'package:jpda/pages/comm/query_store.dart';
 import 'package:jpda/pages/home.dart';
 import 'package:jpda/pages/login/baseurl.dart';
 import 'package:jpda/pages/login/login.dart';
+import 'package:jpda/pages/pandian/detail.dart';
 import 'package:jpda/pages/pandian/home.dart';
+import 'package:jpda/pages/pandian/new.dart';
 import 'package:jpda/pages/product/home.dart';
 import 'package:jpda/pages/stock/home.dart';
 import 'package:jpda/pages/welcome/first.dart';
@@ -45,6 +47,8 @@ final routes = {
   "/baseurl": (context) => BaseUrlPage(),
   "/product/home": (_) => ProductHome(),
   "/pandian/home": (_) => PanDianPage(),
+  "/pandian/new": (_) => PanDianNewPage(),
+  "/pandian/detail": (_) => PanDianDetailPage(),
   "/pandian/query": (_) => QueryPage(),
   "/stock/home": (_) => StockHome(),
   "/stock/query": (_) => QueryPage(),

@@ -30,7 +30,6 @@ class _PanDianPageState extends State<PanDianPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     _refreshController = RefreshController(initialRefresh: false);
     reLoadData();
     super.initState();
@@ -44,7 +43,7 @@ class _PanDianPageState extends State<PanDianPage> {
 
   @override
   Widget build(BuildContext context) {
-    print(_datas);
+//    print(_datas);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -60,7 +59,9 @@ class _PanDianPageState extends State<PanDianPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context).pushNamed("/pandian/new");
+        },
         child: Icon(Icons.add),
       ),
       body: LoadingWidget(
@@ -257,8 +258,7 @@ class PanDianItemWidget extends StatelessWidget {
                             Expanded(
                               child: RichText(
                                 text: TextSpan(
-                                  text:
-                                  "备注：${data['REMARK']}",
+                                  text: "备注：${data['REMARK']}",
                                   style: TextStyle(
                                       fontSize: 12,
                                       fontStyle: FontStyle.italic,
@@ -267,7 +267,7 @@ class PanDianItemWidget extends StatelessWidget {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(left:8.0),
+                              padding: const EdgeInsets.only(left: 8.0),
                               child: Text(
                                 '${data['DOCTYPENAME']}',
                                 style: TextStyle(color: Colors.blue),
@@ -290,12 +290,17 @@ class PanDianItemWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Expanded(child: Text(
+                  Expanded(
+                    child: Text(
                       "行:${data['TOT_LINES']},账:${data['TOT_QTYBOOK']},实:${data['TOT_QTYCOUNT']}",
-                    style: TextStyle(fontStyle: FontStyle.italic),
-                  ),),
+                      style: TextStyle(fontStyle: FontStyle.italic),
+                    ),
+                  ),
                   InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.of(context).pushNamed("/pandian/detail",
+                            arguments: {"id": data['ID']});
+                      },
                       child: Container(
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(3),
