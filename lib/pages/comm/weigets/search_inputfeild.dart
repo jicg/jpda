@@ -51,7 +51,7 @@ class _SearchInputFeildState extends State<SearchInputFeild> {
           maxLines: 1,
           controller: _textEditingController,
           autofocus: true,
-          focusNode: _focusNode,
+//          focusNode: _focusNode,
           textInputAction: TextInputAction.search,
 //          keyboardType: TextInputType.multiline,
           onSubmitted: (_) => widget.query(_textEditingController.text),
@@ -66,8 +66,9 @@ class _SearchInputFeildState extends State<SearchInputFeild> {
   void handleKey(key) {
     if (Theme.of(context).platform == TargetPlatform.android) {
       RawKeyEventDataAndroid data = key.data as RawKeyEventDataAndroid;
-      print(data);
-      if (key.runtimeType.toString() == 'RawKeyUpEvent') {
+      print("${data.keyCode}");
+      if (key is RawKeyUpEvent) {
+
         if (data.keyCode == 66) {
           widget.query(_textEditingController.text);
           //_focusNode.unfocus();
@@ -80,6 +81,17 @@ class _SearchInputFeildState extends State<SearchInputFeild> {
               baseOffset: 0, extentOffset: _textEditingController.text.length);
           widget.query(_textEditingController.text);
         }
+      }
+    }
+  }
+
+
+
+  void back(event){
+    if (event is RawKeyUpEvent && event.data is RawKeyEventDataAndroid) {
+      var data = event.data as RawKeyEventDataAndroid;
+      if (data.keyCode == 13) {
+        debugPrint('onSubmitted');
       }
     }
   }

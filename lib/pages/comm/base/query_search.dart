@@ -23,11 +23,9 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
   bool _single = false;
   Map _arguments = {};
 
-//  List<Map> datas = [];
   Map<int, Map> datas = {};
   List<int> keys = [];
 
-//  Map<int, Map> selDatas = {};
   List<int> selKeys = [];
   bool _loading = false;
   int _page = 1;
@@ -132,9 +130,7 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
   }
 
   void _showModalBottomSheet(BuildContext context) {
-//    setState(() {
-//      _showBottomBtns = false;
-//    });
+
     showModalBottomSheet(
         context: context,
         builder: (context) {
