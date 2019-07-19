@@ -17,7 +17,7 @@ class QueryProductDelegate extends QueryBeanDelegate {
   @override
   Future<Response<Map>> query(BuildContext context,String query, int page) {
     return JPda.web
-        .query(context,"jpda_comm\$query_sku", {"page": page, "query": query});
+        .query("jpda_comm\$query_sku", {"page": page, "query": query},context);
   }
 
   @override

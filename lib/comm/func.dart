@@ -59,7 +59,14 @@ class UIUtils {
       barrierDismissible = true,
       VoidCallback onTap,
       VoidCallback onWillPop,
-      List<FlatButton> actions = const []}) {
+      List<FlatButton> actions}) {
+    if (actions == null) {
+      actions = [];
+    }
+    actions.add(FlatButton(
+      child: Text("确定"),
+      onPressed: onTap,
+    ));
     return showDialog<T>(
       barrierDismissible: barrierDismissible,
       builder: (context) {
@@ -68,11 +75,7 @@ class UIUtils {
             child: AlertDialog(
               title: Text(title),
               content: Text(desc),
-              actions: actions
-                ..add(FlatButton(
-                  child: Text("确定"),
-                  onPressed: onTap,
-                )),
+              actions: actions,
             )
 //          new SimpleDialog(
 //            title: Text(title),

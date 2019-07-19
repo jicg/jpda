@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
@@ -6,6 +7,8 @@ import 'package:jpda/comm/func.dart';
 import 'package:jpda/comm/jpda.dart';
 import 'package:jpda/pages/comm/weigets/detail_title_widget.dart';
 import 'package:jpda/pages/comm/weigets/loading_widget.dart';
+import 'package:jpda/pages/comm/weigets/scan_barcode_inputfeild.dart';
+import 'package:jpda_plugin/jpda_plugin.dart';
 
 class PanDianDetailPage extends StatefulWidget {
   @override
@@ -22,6 +25,8 @@ class _PanDianDetailPageState extends State<PanDianDetailPage> {
   int _status = 1;
   bool _isactive = true;
 
+  StreamSubscription subscription;
+
   @override
   void initState() {
     super.initState();
@@ -29,14 +34,41 @@ class _PanDianDetailPageState extends State<PanDianDetailPage> {
       Map args = ModalRoute.of(context).settings.arguments;
       _docid = args["id"] as int;
       loadData();
+      subscription = JpdaPlugin.scanResponse.listen((data) async {
+        String no = data['no'];
+        try {
+          await addSku(no);
+          JPda.play.success();
+        } catch (e) {
+          JPda.play.error();
+          subscription.pause();
+          JpdaPlugin.closeScanEditText();
+          await UIUtils.jpdaShowMessageDialog(context,
+              title: "条码 $no",
+              barrierDismissible: false,
+              desc: "添加失败原因：$e", onTap: () {
+            Navigator.pop(context);
+            subscription.resume();
+          }, onWillPop: () {
+            subscription.resume();
+            Navigator.pop(context);
+          });
+        }
+      });
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    subscription.cancel();
   }
 
   loadData() async {
     _loading = true;
     try {
       Response data =
-          await JPda.web.query(context, "jpda_pandian\$load", {"id": _docid});
+          await JPda.web.query("jpda_pandian\$load", {"id": _docid}, context);
       print("${data.data}");
       _doc = json.decode(data.data['data']);
       _docInfo = [];
@@ -75,7 +107,9 @@ class _PanDianDetailPageState extends State<PanDianDetailPage> {
                     Icons.more_horiz,
                     color: Colors.white,
                   ),
-                  onPressed: () {})
+                  onPressed: () async {
+                    // todo actions
+                  })
             ],
             backTitle: Text(
               "单据",
@@ -106,9 +140,7 @@ class _PanDianDetailPageState extends State<PanDianDetailPage> {
             },
           );
         }).whenComplete(() {
-      setState(() {
-//        _showBottomBtns = true;
-      });
+      setState(() {});
     });
   }
 
@@ -118,48 +150,21 @@ class _PanDianDetailPageState extends State<PanDianDetailPage> {
       child: Container(
         child: Column(
           children: <Widget>[
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(children: [
-                  Text("商品"),
-                  SizedBox(
-                    width: 12,
-                  ),
-                  Expanded(
-                    child: TextField(
-                      autofocus: true,
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: "输入条码",
-                          contentPadding: EdgeInsets.all(0)),
-                    ),
-                  ),
-                  Material(
-                    color: Colors.blue,
-                    child: InkWell(
-                      onTap: () {},
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          "确定",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  )
-                ]),
-              ),
-            ),
             Expanded(
               child: Card(
-                child: ListView.builder(itemBuilder: (c,i){
+                child: ListView.builder(itemBuilder: (c, i) {
                   return ListTile(
                     title: Text("asoo1"),
                     subtitle: Text("1"),
                   );
                 }),
               ),
+            ),
+            RaisedButton(
+              onPressed: () async {
+                print(await JpdaPlugin.openScanEditText("pandian"));
+              },
+              child: Text("录入"),
             )
           ],
         ),
@@ -260,5 +265,11 @@ class _PanDianDetailPageState extends State<PanDianDetailPage> {
         ],
       ),
     );
+  }
+
+  Future<void> addSku(String no) async {
+    Response data = await JPda.web.query("jpda_pandian\$item_scan",
+        {"no": no, "sheftno": _sheftno, "docid": _docid});
+    _doc = json.decode(data.data['data']);
   }
 }

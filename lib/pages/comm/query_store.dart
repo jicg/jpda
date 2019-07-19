@@ -24,7 +24,7 @@ class QueryStoreDelegate extends QueryBeanDelegate {
   Future<Response<Map>> query(BuildContext context, String query, int page) {
     // TODO: implement query
     return JPda.web.query(
-        context, "jpda_comm\$query_store", {"query": query, "page": page});
+         "jpda_comm\$query_store", {"query": query, "page": page},context);
   }
 
   @override

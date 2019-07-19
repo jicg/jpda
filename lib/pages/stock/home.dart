@@ -46,7 +46,7 @@ class _StockHomeState extends State<StockHome> {
       _param["page"] = _page;
       _datas = [];
       Response<Map> da =
-          await JPda.web.query(context, "jpda_stock\$list", _param);
+          await JPda.web.query( "jpda_stock\$list", _param,context);
       List dd = json.decode(da.data["data"]);
       List<Map> d = dd.map((f) => f as Map).toList();
       if (d.length > 0) {
@@ -65,7 +65,7 @@ class _StockHomeState extends State<StockHome> {
     try {
       _param["page"] = _page;
       Response<Map> da =
-          await JPda.web.query(context, "jpda_stock\$list", _param);
+          await JPda.web.query( "jpda_stock\$list", _param,context);
       List dd = json.decode(da.data["data"]);
       List<Map> d = dd.map((f) => f as Map).toList();
       if (d.length > 0) {

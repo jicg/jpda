@@ -20,7 +20,7 @@ abstract class DioModel {
 
   Future<Response<Map>> login(String email, String pwd);
 
-  Future<Response<Map>> query(BuildContext context, String func, Map param);
+  Future<Response<Map>> query(String func, Map param, [BuildContext context]);
 }
 
 class DioModelIPhone extends DioModel {
@@ -34,8 +34,8 @@ class DioModelIPhone extends DioModel {
 
   bool get hasBaseUrl =>
       (_dio.options.baseUrl ?? "").isNotEmpty &&
-      _dio.options.baseUrl.compareTo("http://") != 0 &&
-      _dio.options.baseUrl.compareTo("https://") != 0;
+          _dio.options.baseUrl.compareTo("http://") != 0 &&
+          _dio.options.baseUrl.compareTo("https://") != 0;
 
   set baseUrl(String value) {
     _dio.options.baseUrl = value;
@@ -46,7 +46,9 @@ class DioModelIPhone extends DioModel {
 
   @override
   Future<Response<Map>> login(String email, String pwd) async {
-    String _t = "${DateTime.now().millisecondsSinceEpoch}";
+    String _t = "${DateTime
+        .now()
+        .millisecondsSinceEpoch}";
     String sign = StringUtils.generateMd5(StringUtils.generateMd5(pwd) + _t);
     print({"u": email, "_t": _t, "sign": sign});
     Response<Map> resp = await _dio.post<Map>("/html/jpda/validate.jsp",
@@ -58,8 +60,8 @@ class DioModelIPhone extends DioModel {
   }
 
   @override
-  Future<Response<Map>> query(
-      BuildContext context, String func, Map param) async {
+  Future<Response<Map>> query(String func, Map param,
+      [BuildContext context]) async {
     if (param == null) {
       param = {};
     }
@@ -85,7 +87,9 @@ Response<Map> _handleRespAuth(BuildContext context, Response<Map> resp) {
   int code = da["code"];
   if (code != 0) {
     if (code == 1001) {
-      Navigator.pushNamed(context, "/login");
+      if (context != null) {
+        Navigator.pushNamed(context, "/login");
+      }
       throw NotLoginException();
     } else {
       throw WebException(resp.data["msg"]);

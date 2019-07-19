@@ -166,12 +166,12 @@ class _PanDianNewPageState extends State<PanDianNewPage> {
                   UIUtils.showDialogWait(context, title: "新增中 。。。");
                   try {
                     Response resp =
-                        await JPda.web.query(context, "jpda_pandian\$new", {
+                        await JPda.web.query( "jpda_pandian\$new", {
                       "doctype": _doctype,
                       "billdate": dateFormat.format(_dateTime),
                       "store": _store,
                       "remark": _remarkController.text,
-                    });
+                    },context);
                     Map doc = json.decode(resp.data["data"]);
                     Navigator.of(context).pop();
                     Navigator.of(context).pushReplacementNamed(

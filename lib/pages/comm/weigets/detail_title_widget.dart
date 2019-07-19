@@ -40,9 +40,9 @@ class _DetailTitleWidgetState extends State<DetailTitleWidget>
   AnimationController _controller;
   Animation<double> _frontOpacity;
 
-//  static final Animatable<double> _frontOpacityTween =
-//      Tween<double>(begin: 0.0, end: 1.0).chain(
-//          CurveTween(curve: const Interval(0.0, 0.4, curve: Curves.easeInOut)));
+  static final Animatable<double> _frontOpacityTween =
+      Tween<double>(begin: 0.0, end: 1.0).chain(
+          CurveTween(curve: const Interval(0.0, 0.4, curve: Curves.easeInOut)));
   final Animatable<BorderRadius> _kFrontHeadingBevelRadius = BorderRadiusTween(
     end: const BorderRadius.only(
       topLeft: Radius.circular(0.0),
@@ -59,7 +59,7 @@ class _DetailTitleWidgetState extends State<DetailTitleWidget>
     super.initState();
     _controller =
         AnimationController(vsync: this, duration: Duration(microseconds: 100));
-//    _frontOpacity = _controller.drive(_frontOpacityTween);
+    _frontOpacity = _controller.drive(_frontOpacityTween);
   }
 
   @override
@@ -182,8 +182,8 @@ class _DetailTitleWidgetState extends State<DetailTitleWidget>
                     ),
                     child: _TappableWhileStatusIs(AnimationStatus.completed,
                         controller: _controller,
-                        child: Visibility(
-                           visible: _controller.status == AnimationStatus.completed, child: widget.frontBody)));
+                        child: FadeTransition(
+                           opacity: _frontOpacity, child: widget.frontBody)));
               })),
     ];
     layers.add(

@@ -146,7 +146,7 @@ class _PanDianPageState extends State<PanDianPage> {
       _param["page"] = _page;
       _datas = [];
       Response<Map> da =
-          await JPda.web.query(context, "jpda_pandian\$list", _param);
+          await JPda.web.query("jpda_pandian\$list", _param, context);
       List dd = json.decode(da.data["data"]);
       List<Map> d = dd.map((f) => f as Map).toList();
       if (d.length > 0) {
@@ -166,7 +166,7 @@ class _PanDianPageState extends State<PanDianPage> {
     try {
       _param["page"] = _page;
       Response<Map> da =
-          await JPda.web.query(context, "jpda_pandian\$list", _param);
+          await JPda.web.query( "jpda_pandian\$list", _param,context);
       List dd = json.decode(da.data["data"]);
       List<Map> d = dd.map((f) => f as Map).toList();
       if (d.length > 0) {
