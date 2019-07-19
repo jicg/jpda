@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.jicg.jpda_plugin">
+
+    <application
+        android:appComponentFactory="jicg_pda"
+        tools:replace="android:appComponentFactory">
+        <activity
+            android:name=".activity.MainActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"></activity>
+    </application>
+
+</manifest>
