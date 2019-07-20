@@ -3,6 +3,7 @@ import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -59,12 +60,13 @@ class UIUtils {
       barrierDismissible = true,
       VoidCallback onTap,
       VoidCallback onWillPop,
-      List<FlatButton> actions}) {
+      List<FlatButton> actions,
+      String okLabel = "确定"}) {
     if (actions == null) {
       actions = [];
     }
     actions.add(FlatButton(
-      child: Text("确定"),
+      child: Text(okLabel),
       onPressed: onTap,
     ));
     return showDialog<T>(
@@ -76,18 +78,7 @@ class UIUtils {
               title: Text(title),
               content: Text(desc),
               actions: actions,
-            )
-//          new SimpleDialog(
-//            title: Text(title),
-//            children: <Widget>[
-//              Text(desc),
-//              FlatButton(
-//                child: Text("确定"),
-//                onPressed: onTap,
-//              )
-//            ],
-//          ),
-            );
+            ));
       },
       context: context,
     );

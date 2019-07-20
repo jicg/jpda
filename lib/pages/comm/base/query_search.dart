@@ -136,66 +136,65 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
         builder: (context) {
           return StatefulBuilder(
             builder: (BuildContext context, state) {
-              return InkWell(
-                onTap: () {},
-                child: Container(
-                  color: Colors.white,
-                  child: Column(
-                    children: <Widget>[
-                      Container(
-                        color: Colors.blue,
-                        child: Stack(
-                          children: <Widget>[
-                            Align(
-                                alignment: Alignment.centerLeft,
+              return Material(
+                color: Colors.white,
+                child: Column(
+                  children: <Widget>[
+                    Card(
+                      margin: EdgeInsets.all(0),
+                      shape: RoundedRectangleBorder(),
+                      color: Colors.blue,
+                      child: Stack(
+                        children: <Widget>[
+                          Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  "已经选择",
+                                  style: TextStyle(
+                                      fontSize: 18, color: Colors.white),
+                                ),
+                              )),
+                          Align(
+                              alignment: Alignment.centerRight,
+                              child: InkWell(
+                                onTap: () {
+                                  state(() {
+                                    selKeys.clear();
+                                  });
+                                },
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
-                                    "已经选择",
-                                    style: TextStyle(
-                                        fontSize: 18, color: Colors.white),
+                                    "清除",
+                                    style: TextStyle(color: Colors.white),
                                   ),
-                                )),
-                            Align(
-                                alignment: Alignment.centerRight,
-                                child: InkWell(
-                                  onTap: () {
-                                    state(() {
-                                      selKeys.clear();
-                                    });
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      "清除",
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                                )),
-                          ],
-                        ),
+                                ),
+                              )),
+                        ],
                       ),
-                      Expanded(
-                        child: ListView.separated(
-                            itemBuilder: (context, i) {
-                              final int id = selKeys[i];
-                              final Map map = datas[id];
-                              return widget.delegate.buildBootItem(context, map,
-                                  () {
-                                state(() {
-                                  selKeys.remove(id);
-                                });
+                    ),
+                    Expanded(
+                      child: ListView.separated(
+                          itemBuilder: (context, i) {
+                            final int id = selKeys[i];
+                            final Map map = datas[id];
+                            return widget.delegate.buildBootItem(context, map,
+                                () {
+                              state(() {
+                                selKeys.remove(id);
                               });
-                            },
-                            separatorBuilder: (context, i) {
-                              return new Divider(
-                                height: 0,
-                              );
-                            },
-                            itemCount: selKeys.length),
-                      ),
-                    ],
-                  ),
+                            });
+                          },
+                          separatorBuilder: (context, i) {
+                            return new Divider(
+                              height: 0,
+                            );
+                          },
+                          itemCount: selKeys.length),
+                    ),
+                  ],
                 ),
               );
             },
@@ -390,6 +389,7 @@ abstract class QueryBeanDelegate {
           : null,
       title: Text("${map['code']} "),
       subtitle: Text("${map['name']} ${map['desc']}"),
+      onTap: (){},
       trailing: InkWell(
           onTap: onTap,
           child: Padding(

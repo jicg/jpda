@@ -17,13 +17,16 @@ class PanDianDetailPage extends StatefulWidget {
 
 class _PanDianDetailPageState extends State<PanDianDetailPage> {
   bool _loading = false;
+  bool _loading_item = false;
   int _docid;
-  String _sheftno = "---";
+  String _sheftno = "";
+  Map _sheftnoMaps = {"111": {}, "222": {}};
   int _totqty = 0;
   Map _doc = {"docno": ""};
   List<Widget> _docInfo = [];
   int _status = 1;
   bool _isactive = true;
+  TextEditingController _seftnoController = TextEditingController();
 
   StreamSubscription subscription;
 
@@ -34,37 +37,17 @@ class _PanDianDetailPageState extends State<PanDianDetailPage> {
       Map args = ModalRoute.of(context).settings.arguments;
       _docid = args["id"] as int;
       loadData();
-      subscription = JpdaPlugin.scanResponse.listen((data) async {
-        String no = data['no'];
-        try {
-          await addSku(no);
-          JPda.play.success();
-        } catch (e) {
-          JPda.play.error();
-          subscription.pause();
-          JpdaPlugin.closeScanEditText();
-          await UIUtils.jpdaShowMessageDialog(context,
-              title: "条码 $no",
-              barrierDismissible: false,
-              desc: "添加失败原因：$e", onTap: () {
-            Navigator.pop(context);
-            subscription.resume();
-          }, onWillPop: () {
-            subscription.resume();
-            Navigator.pop(context);
-          });
-        }
-      });
+      subscription = JpdaPlugin.scanResponse.listen(listenScan);
     });
   }
 
   @override
   void dispose() {
     super.dispose();
-    subscription.cancel();
+    subscription?.cancel();
   }
 
-  loadData() async {
+  void loadData() async {
     _loading = true;
     try {
       Response data =
@@ -93,12 +76,131 @@ class _PanDianDetailPageState extends State<PanDianDetailPage> {
     }
   }
 
+  void listenScan(Map data) async {
+    String no = data['no'];
+    print(no);
+    try {
+      await addSku(no);
+      JPda.play.success();
+    } catch (e) {
+      JPda.play.error();
+      subscription.pause();
+      JpdaPlugin.closeScanEditText();
+      await UIUtils.jpdaShowMessageDialog(context,
+          title: "条码 $no",
+          barrierDismissible: false,
+          desc: "添加失败原因：$e", onTap: () {
+        Navigator.pop(context);
+        subscription.resume();
+        JpdaPlugin.openScanEditText("pandian");
+      }, onWillPop: () {
+        subscription.resume();
+        Navigator.pop(context);
+        JpdaPlugin.openScanEditText("pandian");
+      });
+    }
+  }
+
+  Future<void> addSku(String no) async {
+    Response data = await JPda.web.query("jpda_pandian\$item_scan",
+        {"no": no, "sheftno": _sheftno, "docid": _docid});
+    _doc = json.decode(data.data['data']);
+  }
+
+  Future<void> addSeftno(String val) async {
+    // todo 选择或添加货号
+    _sheftno=val;
+    throw Exception("测试");
+  }
+
+  void showSheftnoPicker(BuildContext context) {
+    showModalBottomSheet(
+        builder: (context) {
+          return Column(
+            children: <Widget>[
+              Card(
+                elevation: 4,
+                margin: EdgeInsets.all(0),
+                shape: BeveledRectangleBorder(),
+                color: Colors.blue,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                      child: Text(
+                    "选择货号",
+                    style: TextStyle(color: Colors.white),
+                  )),
+                ),
+              ),
+              Divider(
+                height: 1,
+              ),
+              Expanded(
+                child: ListView.separated(
+                  itemBuilder: (context, i) {
+                    return ListTile(
+                      onTap: () {
+
+                      },
+                      title: Text("----"),
+                      subtitle: Text("行:0,数:100"),
+                      trailing: InkWell(
+                        onTap: () {
+                          UIUtils.jpdaShowMessageDialog(context, actions: [
+                            FlatButton(
+                              child: Text("取消"),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ], onTap: () {
+                            // todo 删除明细
+                          },
+                              title: "操作警告",
+                              desc: "确定删除货架 ？？ ,删除后，将无法恢复！",
+                              okLabel: "确定");
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Icon(Icons.delete),
+                        ),
+                      ),
+                    );
+                  },
+                  itemCount: _sheftnoMaps.length,
+                  separatorBuilder: (BuildContext context, int index) {
+                    return Divider(
+                      height: 1,
+                    );
+                  },
+                ),
+              ),
+              Card(
+                color: Colors.blue,
+                child: InkWell(
+                    onTap: () => showSeftnoDialog(context),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Center(
+                        child: Text(
+                          "新增货架并扫描",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    )),
+              )
+            ],
+          );
+        },
+        context: context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       body: SafeArea(
-          bottom: false,
+          bottom: true,
           child: DetailTitleWidget(
             showCloseBtn: true,
             actions: [
@@ -145,26 +247,60 @@ class _PanDianDetailPageState extends State<PanDianDetailPage> {
   }
 
   Widget _buildItemPage(BuildContext context) {
+    // todo 页面咋办呢？？
     return LoadingWidget(
-      loading: _loading,
+      loading: _loading_item,
       child: Container(
         child: Column(
           children: <Widget>[
-            Expanded(
-              child: Card(
-                child: ListView.builder(itemBuilder: (c, i) {
-                  return ListTile(
-                    title: Text("asoo1"),
-                    subtitle: Text("1"),
-                  );
-                }),
+            Card(
+              child: Row(
+                children: <Widget>[],
               ),
             ),
-            RaisedButton(
-              onPressed: () async {
-                print(await JpdaPlugin.openScanEditText("pandian"));
-              },
-              child: Text("录入"),
+            Expanded(
+              child: Card(
+                child: ListView.builder(
+                  itemBuilder: (context, i) {
+                    return new Container();
+                  },
+                  itemCount: 1,
+                ),
+              ),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                border:
+                    Border(top: BorderSide(width: 2, color: Colors.black54)),
+              ),
+              child: Row(children: [
+                Expanded(
+                    child: InkWell(
+                  onTap: () => showSheftnoPicker(context),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Center(child: Text("选择货号 $_sheftno")),
+                  ),
+                )),
+                Expanded(
+                  child: Material(
+                    color: Colors.red,
+                    child: InkWell(
+                      onTap: () async {
+                        print(await JpdaPlugin.openScanEditText("pandian"));
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Center(
+                            child: Text(
+                          "录入",
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                        )),
+                      ),
+                    ),
+                  ),
+                ),
+              ]),
             )
           ],
         ),
@@ -173,6 +309,29 @@ class _PanDianDetailPageState extends State<PanDianDetailPage> {
   }
 
   Widget _buildDocPage(BuildContext context) {
+    final List<Widget> docWidgets = <Widget>[
+      Container(
+        color: _isactive
+            ? (_status == 2
+                ? Colors.red
+                : (_status == 1 ? Colors.green : Colors.blueAccent))
+            : Colors.grey,
+        padding: const EdgeInsets.all(8.0),
+        child: Center(
+          child: Text(
+            " ${_isactive ? (_status == 2 ? '已提交' : (_status == 1 ? '未提交' : '待审核')) : '已作废'}",
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(top: 8.0),
+        child: Text(
+          "${_doc['docno']}",
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+      )
+    ]..addAll(_docInfo);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Card(
@@ -183,30 +342,7 @@ class _PanDianDetailPageState extends State<PanDianDetailPage> {
             child: Padding(
               padding: const EdgeInsets.all(12.0),
               child: Column(
-                children: <Widget>[
-                  Container(
-                    color: _isactive
-                        ? (_status == 2
-                            ? Colors.red
-                            : (_status == 1 ? Colors.green : Colors.blueAccent))
-                        : Colors.grey,
-                    padding: const EdgeInsets.all(8.0),
-                    child: Center(
-                      child: Text(
-                        " ${_isactive ? (_status == 2 ? '已提交' : (_status == 1 ? '未提交' : '待审核')) : '已作废'}",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Text(
-                      "${_doc['docno']}",
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
-                  )
-                ]..addAll(_docInfo),
+                children: docWidgets,
               ),
             ),
           ),
@@ -267,9 +403,55 @@ class _PanDianDetailPageState extends State<PanDianDetailPage> {
     );
   }
 
-  Future<void> addSku(String no) async {
-    Response data = await JPda.web.query("jpda_pandian\$item_scan",
-        {"no": no, "sheftno": _sheftno, "docid": _docid});
-    _doc = json.decode(data.data['data']);
+  void showSeftnoDialog(BuildContext context) {
+    showDialog<String>(
+        context: context,
+        builder: (c) {
+          return SimpleDialog(children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              child: Row(children: [
+                Text("货架:"),
+                SizedBox(
+                  width: 10,
+                ),
+                Expanded(
+                    child: Container(
+                        child: TextField(
+                  controller: _seftnoController,
+                  decoration: InputDecoration(border: InputBorder.none),
+                  onSubmitted: (val) {
+                    Navigator.pop(context, val);
+                  },
+                  autofocus: true,
+                )))
+              ]),
+            ),
+            Divider(
+              height: 1,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                FlatButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text("取消")),
+                FlatButton(
+                    onPressed: () {
+                      Navigator.pop(context, _seftnoController.text);
+                    },
+                    child: Text("确定")),
+              ],
+            )
+          ]);
+        }).then((val) {
+      if (val != null && val.isNotEmpty) {
+        addSeftno(val);
+        // todo add sheftno
+      }
+    });
   }
 }

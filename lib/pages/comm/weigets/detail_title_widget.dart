@@ -110,7 +110,19 @@ class _DetailTitleWidgetState extends State<DetailTitleWidget>
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: _buildStack);
+    return WillPopScope(
+      child: LayoutBuilder(builder: _buildStack),
+      onWillPop: () {
+        if (_controller.isAnimating) {
+          return Future.value(false);
+        }
+        if (_controller.status == AnimationStatus.completed) {
+          _toggleFrontLayer();
+          return Future.value(false);
+        }
+        return Future<bool>.value(true);
+      },
+    );
   }
 
   Widget _buildStack(BuildContext context, BoxConstraints constraints) {
@@ -183,7 +195,7 @@ class _DetailTitleWidgetState extends State<DetailTitleWidget>
                     child: _TappableWhileStatusIs(AnimationStatus.completed,
                         controller: _controller,
                         child: FadeTransition(
-                           opacity: _frontOpacity, child: widget.frontBody)));
+                            opacity: _frontOpacity, child: widget.frontBody)));
               })),
     ];
     layers.add(
