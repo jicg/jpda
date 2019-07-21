@@ -10,7 +10,6 @@ class QueryRowInputFeild extends StatefulWidget {
 class _QueryRowInputFeildState extends State<QueryRowInputFeild> {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return null;
   }
 

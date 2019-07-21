@@ -27,7 +27,6 @@ class _StockHomeState extends State<StockHome> {
 
   @override
   void initState() {
-    // TODO: implement initState
     _refreshController = RefreshController(initialRefresh: false);
     reLoadData();
     super.initState();

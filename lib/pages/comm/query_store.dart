@@ -17,17 +17,14 @@ class _QueryStorePageState extends State<QueryStorePage> {
 
 class QueryStoreDelegate extends QueryBeanDelegate {
   @override
-  // TODO: implement hintText
   String get hintText => "店仓名称/店仓编号";
 
   @override
   Future<Response<Map>> query(BuildContext context, String query, int page) {
-    // TODO: implement query
     return JPda.web.query(
          "jpda_comm\$query_store", {"query": query, "page": page},context);
   }
 
   @override
-  // TODO: implement title
   String get title => "店仓查询";
 }

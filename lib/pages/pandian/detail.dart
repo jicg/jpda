@@ -7,8 +7,8 @@ import 'package:jpda/comm/func.dart';
 import 'package:jpda/comm/jpda.dart';
 import 'package:jpda/pages/comm/weigets/detail_title_widget.dart';
 import 'package:jpda/pages/comm/weigets/loading_widget.dart';
-import 'package:jpda/pages/comm/weigets/scan_barcode_inputfeild.dart';
 import 'package:jpda_plugin/jpda_plugin.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class PanDianDetailPage extends StatefulWidget {
   @override
@@ -20,15 +20,17 @@ class _PanDianDetailPageState extends State<PanDianDetailPage> {
   bool _loading_item = false;
   int _docid;
   String _sheftno = "";
-  Map _sheftnoMaps = {"111": {}, "222": {}};
   int _totqty = 0;
   Map _doc = {"docno": ""};
   List<Widget> _docInfo = [];
   int _status = 1;
   bool _isactive = true;
-  TextEditingController _seftnoController = TextEditingController();
 
   StreamSubscription subscription;
+
+  int page = 1;
+  List<Map> items = [];
+  RefreshController _refreshController;
 
   @override
   void initState() {
@@ -39,12 +41,14 @@ class _PanDianDetailPageState extends State<PanDianDetailPage> {
       loadData();
       subscription = JpdaPlugin.scanResponse.listen(listenScan);
     });
+    _refreshController = RefreshController();
   }
 
   @override
   void dispose() {
     super.dispose();
     subscription?.cancel();
+    _refreshController?.dispose();
   }
 
   void loadData() async {
@@ -82,6 +86,7 @@ class _PanDianDetailPageState extends State<PanDianDetailPage> {
     try {
       await addSku(no);
       JPda.play.success();
+      reLoadItem();
     } catch (e) {
       JPda.play.error();
       subscription.pause();
@@ -108,91 +113,102 @@ class _PanDianDetailPageState extends State<PanDianDetailPage> {
   }
 
   Future<void> addSeftno(String val) async {
-    // todo 选择或添加货号
-    _sheftno=val;
-    throw Exception("测试");
+    print("addSeftno $_sheftno $val");
+    if (val == null || val.isEmpty) {
+      setState(() {
+        _sheftno = val;
+        _totqty = 0;
+      });
+      return;
+    }
+    if (val == _sheftno) {
+      return;
+    }
+    try {
+      Response response = await JPda.web.query(
+          "jpda_pandian\$item_addsheftnos", {"docid": _docid, "sheftno": val});
+      Map obj = json.decode(response.data['data']);
+      setState(() {
+        _sheftno = val;
+        _totqty = obj['totqty'] as int;
+      });
+      reLoadItem();
+    } catch (e) {
+      print(e);
+      UIUtils.toaskError("操作失败: $e");
+    }
   }
 
-  void showSheftnoPicker(BuildContext context) {
-    showModalBottomSheet(
+  void showSheftnoPicker(BuildContext context) async {
+    // todo 查询 货架
+    String str = await showModalBottomSheet<String>(
         builder: (context) {
-          return Column(
-            children: <Widget>[
-              Card(
-                elevation: 4,
-                margin: EdgeInsets.all(0),
-                shape: BeveledRectangleBorder(),
-                color: Colors.blue,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Center(
-                      child: Text(
-                    "选择货号",
-                    style: TextStyle(color: Colors.white),
-                  )),
-                ),
-              ),
-              Divider(
-                height: 1,
-              ),
-              Expanded(
-                child: ListView.separated(
-                  itemBuilder: (context, i) {
-                    return ListTile(
-                      onTap: () {
-
-                      },
-                      title: Text("----"),
-                      subtitle: Text("行:0,数:100"),
-                      trailing: InkWell(
-                        onTap: () {
-                          UIUtils.jpdaShowMessageDialog(context, actions: [
-                            FlatButton(
-                              child: Text("取消"),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ], onTap: () {
-                            // todo 删除明细
-                          },
-                              title: "操作警告",
-                              desc: "确定删除货架 ？？ ,删除后，将无法恢复！",
-                              okLabel: "确定");
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Icon(Icons.delete),
-                        ),
-                      ),
-                    );
-                  },
-                  itemCount: _sheftnoMaps.length,
-                  separatorBuilder: (BuildContext context, int index) {
-                    return Divider(
-                      height: 1,
-                    );
-                  },
-                ),
-              ),
-              Card(
-                color: Colors.blue,
-                child: InkWell(
-                    onTap: () => showSeftnoDialog(context),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Center(
-                        child: Text(
-                          "新增货架并扫描",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    )),
-              )
-            ],
+          return ShelfnoView(
+            docid: _docid,
+            cursheftno: _sheftno,
+            status: _status,
+            isactive: _isactive,
           );
         },
         context: context);
+    addSeftno(str);
+  }
+
+  void reLoadItem() async {
+    // todo 更新总数量
+    try {
+      page = 1;
+      items = [];
+      _loading_item = true;
+      Response<Map> da = await JPda.web.query("jpda_pandian\$item_list",
+          {"page": page, "sheftno": _sheftno, "docid": _docid});
+      List dd = json.decode(da.data["data"]);
+      List<Map> d = dd.map((f) => f as Map).toList();
+      if (d.length > 0) {
+        page++;
+        items.addAll(d);
+        setState(() {
+          _refreshController.loadComplete();
+        });
+      } else {
+        UIUtils.toaskError("已经没有数据");
+        setState(() {
+          _refreshController.loadNoData();
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _refreshController.loadFailed();
+      });
+    }
+    setState(() {
+      _loading_item = false;
+    });
+  }
+
+  Future<void> loadItemMore() async {
+    try {
+      Response<Map> da = await JPda.web.query("jpda_pandian\$item_list",
+          {"page": page, "sheftno": _sheftno, "docid": _docid});
+      List dd = json.decode(da.data["data"]);
+      List<Map> d = dd.map((f) => f as Map).toList();
+      if (d.length > 0) {
+        page++;
+        items.addAll(d);
+        setState(() {
+          _refreshController.loadComplete();
+        });
+      } else {
+        UIUtils.toaskError("已经没有数据");
+        setState(() {
+          _refreshController.loadNoData();
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _refreshController.loadFailed();
+      });
+    }
   }
 
   @override
@@ -247,24 +263,43 @@ class _PanDianDetailPageState extends State<PanDianDetailPage> {
   }
 
   Widget _buildItemPage(BuildContext context) {
-    // todo 页面咋办呢？？
     return LoadingWidget(
       loading: _loading_item,
       child: Container(
         child: Column(
           children: <Widget>[
-            Card(
-              child: Row(
-                children: <Widget>[],
-              ),
-            ),
             Expanded(
               child: Card(
-                child: ListView.builder(
-                  itemBuilder: (context, i) {
-                    return new Container();
+                child: SmartRefresher(
+                  controller: _refreshController,
+                  enablePullDown: false,
+                  enablePullUp: true,
+                  onLoading: () async {
+                    await loadItemMore();
                   },
-                  itemCount: 1,
+                  child: ListView.separated(
+                    itemBuilder: (context, i) {
+                      final Map d = items[i];
+                      return ListTile(
+                        title: Text("${d['SKU']}"),
+                        subtitle: Text("${d['REMARK']}"),
+                        onTap: () {
+                          // todo 修改明细
+                        },
+                        trailing: Text(
+                          "${d['QTY']}",
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                      );
+                    },
+                    itemCount: items.length,
+                    separatorBuilder: (BuildContext context, int index) {
+                      return Divider(
+                        height: 1,
+                      );
+                    },
+                  ),
                 ),
               ),
             ),
@@ -402,9 +437,147 @@ class _PanDianDetailPageState extends State<PanDianDetailPage> {
       ),
     );
   }
+}
 
-  void showSeftnoDialog(BuildContext context) {
-    showDialog<String>(
+class ShelfnoView extends StatefulWidget {
+  final int docid;
+  final int status;
+  final bool isactive;
+  final String cursheftno;
+
+  const ShelfnoView(
+      {Key key, this.docid, this.status, this.cursheftno, this.isactive})
+      : super(key: key);
+
+  @override
+  _ShelfnoViewState createState() => _ShelfnoViewState();
+}
+
+class _ShelfnoViewState extends State<ShelfnoView> {
+  bool _isloading = false;
+  String _cursheftno;
+
+  List<Map> _sheftnos = [];
+  TextEditingController _seftnoController = null;
+
+  @override
+  void initState() {
+    super.initState();
+    _cursheftno = widget.cursheftno;
+    _seftnoController = TextEditingController();
+    loadData();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _seftnoController.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      child: LoadingWidget(
+        loading: _isloading,
+        child: Column(
+          children: <Widget>[
+            Card(
+              elevation: 4,
+              margin: EdgeInsets.all(0),
+              shape: BeveledRectangleBorder(),
+              color: Colors.blue,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                    child: Text(
+                  "选择货号",
+                  style: TextStyle(color: Colors.white),
+                )),
+              ),
+            ),
+            Divider(
+              height: 1,
+            ),
+            Expanded(
+              child: ListView.separated(
+                itemBuilder: (context, i) {
+                  final Map sheft = _sheftnos[i];
+                  return ListTile(
+                    onTap: () {
+                      _cursheftno = sheft['code'] as String;
+                      Navigator.of(context).pop(_cursheftno);
+                    },
+                    title: Text("${sheft['code']}"),
+                    subtitle: Text("${sheft['desc']}"),
+                    trailing: InkWell(
+                      onTap: () => delSheftno(sheft['code']),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Icon(Icons.delete),
+                      ),
+                    ),
+                  );
+                },
+                itemCount: _sheftnos.length,
+                separatorBuilder: (BuildContext context, int index) {
+                  return Divider(
+                    height: 1,
+                  );
+                },
+              ),
+            ),
+            Card(
+              color: Colors.blue,
+              child: InkWell(
+                  onTap: () => showSeftnoDialog(context),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Center(
+                      child: Text(
+                        "新增货架并扫描",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  )),
+            )
+          ],
+        ),
+      ),
+      onWillPop: () {
+        Navigator.pop(context, _cursheftno);
+        return Future.value(false);
+      },
+    );
+  }
+
+  void loadData() async {
+    _isloading = true;
+    try {
+      Response data = await JPda.web
+          .query("jpda_pandian\$item_loadsheftnos", {"docid": widget.docid});
+      print(data.data);
+      List ds = json.decode(data.data['data']);
+      _sheftnos = ds.map((f) {
+        return f as Map;
+      }).toList();
+      if (_sheftnos.length > 0) {
+        if (_cursheftno == null || _cursheftno.isEmpty) {
+          _cursheftno = _sheftnos[0]["code"];
+        }
+      } else {
+        _cursheftno = "";
+      }
+    } catch (e) {
+      print(e);
+      UIUtils.toaskError("查询货架失败：$e");
+    }
+    setState(() {
+      _isloading = false;
+    });
+  }
+
+  void showSeftnoDialog(BuildContext context) async {
+    String val = await showDialog<String>(
         context: context,
         builder: (c) {
           return SimpleDialog(children: [
@@ -447,11 +620,36 @@ class _PanDianDetailPageState extends State<PanDianDetailPage> {
               ],
             )
           ]);
-        }).then((val) {
-      if (val != null && val.isNotEmpty) {
-        addSeftno(val);
-        // todo add sheftno
+        });
+    if (val != null && val.isNotEmpty) {
+      _cursheftno = val;
+      print("showSeftnoDialog " + val);
+      Navigator.pop(context, val);
+      JpdaPlugin.openScanEditText("pandian");
+    }
+  }
+
+  void delSheftno(String code) async {
+    bool flag = await UIUtils.jpdaShowMessageDialog<bool>(context, actions: [
+      FlatButton(
+        child: Text("取消"),
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+      ),
+    ], onTap: () {
+      Navigator.of(context).pop(true);
+    }, title: "操作警告", desc: "确定删除货架【$code】,删除后,将无法恢复！", okLabel: "确定");
+
+    if (flag != null && flag) {
+      try {
+        await JPda.web.query("jpda_pandian\$item_delsheftnos",
+            {"docid": widget.docid, "sheftno": code});
+        _cursheftno = "";
+        loadData();
+      } catch (e) {
+        UIUtils.toaskError("删除失败：$e");
       }
-    });
+    }
   }
 }
