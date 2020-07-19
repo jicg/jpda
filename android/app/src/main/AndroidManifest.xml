@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.jicg.jpda">
 
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
@@ -17,8 +18,8 @@
 
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="jpda"
-        android:icon="@mipmap/ic_launcher">
+        android:label="采集器"
+        android:icon="@mipmap/app">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

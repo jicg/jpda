@@ -16,6 +16,7 @@ import 'package:jpda/pages/welcome/first.dart';
 import 'package:jpda/comm/jpda.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   JPda.initGetIt();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {
@@ -33,6 +34,10 @@ class MyApp extends StatelessWidget {
 
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        pageTransitionsTheme: new PageTransitionsTheme(builders: const {
+          TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        }),
       ),
       initialRoute: "/",
       routes: routes,

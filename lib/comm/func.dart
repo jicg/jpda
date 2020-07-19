@@ -3,7 +3,6 @@ import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -84,53 +83,83 @@ class UIUtils {
     );
   }
 
-  static toaskError(String msg) {
+  static toaskError(BuildContext context, String msg) {
+//    Fluttertoast.showToast(
+////        toastDuration: Duration(seconds: 1),
+//        gravity: ToastGravity.TOP,
+//        textColor: Colors.white,
+//        backgroundColor: Colors.red,
+//        msg: msg
+////        child: Container(
+////          child: Text(
+////            "$msg",
+////            style: TextStyle(color: Colors.white),
+////          ),
+////          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+////          decoration: BoxDecoration(color: Colors.red,
+////          boxShadow: [BoxShadow(color: Colors.red,blurRadius: 10,spreadRadius: 20)],
+////          borderRadius: BorderRadius.all(Radius.circular(3))),
+////        ))
+//        );
     Fluttertoast.showToast(
         msg: msg,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
-        timeInSecForIos: 1,
-        backgroundColor: Colors.red,
+        timeInSecForIosWeb: 1,
         textColor: Colors.white,
-        fontSize: 16.0);
-  }
-
-  static toaskSuccess(String msg) {
-    Fluttertoast.showToast(
-        msg: msg,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIos: 1,
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.red,
 //        textColor: Colors.white,
         fontSize: 16.0);
   }
-}
 
-class PermUtils {
-  static Future<Map<PermissionGroup, PermissionStatus>>
-      requestPermissions() async {
-    return await PermissionHandler().requestPermissions(
-        [PermissionGroup.contacts, PermissionGroup.storage]);
-  }
-
-  static Future<PermissionStatus> requestPermission(
-      PermissionGroup permission) async {
-    final List<PermissionGroup> permissions = <PermissionGroup>[permission];
-    final Map<PermissionGroup, PermissionStatus> permissionRequestResult =
-        await PermissionHandler().requestPermissions(permissions);
-    return permissionRequestResult[permission];
-  }
-
-  static Future<Map<PermissionGroup, PermissionStatus>> requestPermissionList(
-      List<PermissionGroup> permissions) async {
-    return await PermissionHandler().requestPermissions(permissions);
-  }
-
-  static Future<bool> openAppSettings() async {
-    return await PermissionHandler().openAppSettings();
+  static toaskSuccess(BuildContext context, String msg) {
+    Fluttertoast.showToast(
+        msg: msg,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+//        textColor: Colors.white,
+        fontSize: 16.0);
+//    FlutterToast(context).showToast(
+//        toastDuration: Duration(seconds: 1),
+//        gravity: ToastGravity.TOP,
+//        child: Container(
+//          child: Text(
+//            "$msg",
+//            style: TextStyle(color: Colors.white),
+//          ),
+//          decoration: BoxDecoration(
+//              color: Colors.green.withAlpha(60),
+//              borderRadius: BorderRadius.circular(10)),
+//        ));
   }
 }
+
+//class PermUtils {
+//  static Future<Map<PermissionGroup, PermissionStatus>>
+//      requestPermissions() async {
+//    return await PermissionHandler().requestPermissions(
+//        [PermissionGroup.contacts, PermissionGroup.storage]);
+//  }
+//
+//  static Future<PermissionStatus> requestPermission(
+//      PermissionGroup permission) async {
+//    final List<PermissionGroup> permissions = <PermissionGroup>[permission];
+//    final Map<PermissionGroup, PermissionStatus> permissionRequestResult =
+//        await PermissionHandler().requestPermissions(permissions);
+//    return permissionRequestResult[permission];
+//  }
+//
+//  static Future<Map<Permission, PermissionStatus>> requestPermissionList(
+//      List<PermissionGroup> permissions) async {
+//    return await PermissionHandler().requestPermissions(permissions);
+//  }
+//
+//  static Future<bool> openAppSettings() async {
+//    return await PermissionHandler().openAppSettings();
+//  }
+//}
 
 //// md5 加密
 //String generateMd5(String data) {

@@ -37,7 +37,7 @@ class _MainPageState extends State<MainPage> {
         JPda.user.login = JPda.user.user;
       }
     } catch (e) {
-      UIUtils.toaskError("$e");
+      UIUtils.toaskError(context,"$e");
     } finally {
       setState(() {
         _loading = false;
@@ -105,11 +105,11 @@ class _MainPageState extends State<MainPage> {
               )
             ],
           ),
-          ListTile(
-            leading: Icon(Icons.settings),
-            title: Text("设置"),
-            onTap: () => {},
-          ),
+//          ListTile(
+//            leading: Icon(Icons.settings),
+//            title: Text("设置"),
+//            onTap: () => {},
+//          ),
           Divider(),
           ListTile(
             leading: Icon(Icons.info),
@@ -196,12 +196,11 @@ class _MainPageState extends State<MainPage> {
   }
 
   Future initPerms() async {
-    Map<PermissionGroup, PermissionStatus> perms =
-        await PermUtils.requestPermissionList([
-      PermissionGroup.storage,
-      PermissionGroup.camera,
-      PermissionGroup.phone
-    ]);
+    Map<Permission, PermissionStatus> perms = await [
+      Permission.storage,
+      Permission.camera,
+      Permission.phone
+    ].request();
     perms.forEach((key, value) async {
       if (value != PermissionStatus.granted) {
         await UIUtils.jpdaShowMessageDialog(context,
@@ -214,8 +213,8 @@ class _MainPageState extends State<MainPage> {
               FlatButton(
                 child: Text("系统权限"),
                 onPressed: () async {
-                  if (!await PermUtils.openAppSettings()) {
-                    UIUtils.toaskError("系统应用权限，打开失败");
+                  if (!await openAppSettings()) {
+                    UIUtils.toaskError(context,"系统应用权限，打开失败");
                   }
                 },
               )

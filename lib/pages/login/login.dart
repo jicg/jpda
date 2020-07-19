@@ -21,7 +21,7 @@ class _LoginPageState extends State<LoginPage> {
     var _form = _formKey.currentState;
     if (!JPda.web.hasBaseUrl) {
       Navigator.pushNamed(context, "/baseurl");
-      UIUtils.toaskError("请设置地址！");
+      UIUtils.toaskError(context,"请设置地址！");
       return;
     }
 
@@ -31,12 +31,13 @@ class _LoginPageState extends State<LoginPage> {
       try {
         Response<Map> da = await JPda.web.login(_name, _password);
         JPda.user.login = new User(da.data["name"], _name, _password);
-        UIUtils.toaskSuccess("登录成功");
+        UIUtils.toaskSuccess(context,"登录成功");
         Navigator.pop(context);
         Navigator.pop(context);
-      } catch (err) {
+      } catch (err,s) {
         Navigator.pop(context);
-        UIUtils.toaskError(err.toString());
+        print("$err, $s");
+        UIUtils.toaskError(context,err.toString());
       }
     }
   }

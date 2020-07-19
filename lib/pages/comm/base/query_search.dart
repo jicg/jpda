@@ -64,8 +64,8 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
       _loading = true;
       _page = 1;
       keys = [];
-      Response<Map> da = await widget.delegate.query(context, _query, _page);
-      List dd = json.decode(da.data["data"]);
+      Map da = await widget.delegate.query(context, _query, _page);
+      List dd = json.decode(da["data"]);
       dd.forEach((f) {
         Map ff = f as Map;
         int id = ff["id"] as int;
@@ -80,12 +80,12 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
       }
     }
 //    on NotLoginException {
-//      UIUtils.ToaskError("请先登录");
+//      UIUtils.toaskError(context,"请先登录");
 //      Navigator.of(context).pushNamed("/login");
 //    }
 
     catch (e) {
-      UIUtils.toaskError("$e");
+      UIUtils.toaskError(context,"$e");
     }
     setState(() {
       _loading = false;
@@ -94,8 +94,8 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
 
   Future<void> loadMoreData() async {
     try {
-      Response<Map> da = await widget.delegate.query(context, _query, _page);
-      List dd = json.decode(da.data["data"]);
+      Map da = await widget.delegate.query(context, _query, _page);
+      List dd = json.decode(da["data"]);
       dd.forEach((f) {
         Map ff = f as Map;
         int id = ff["id"] as int;
@@ -111,13 +111,13 @@ class _QueryBaseWidgetState extends State<QueryBaseWidget> {
           _refreshController.loadComplete();
         });
       } else {
-        UIUtils.toaskError("已经没有数据");
+        UIUtils.toaskError(context,"已经没有数据");
         setState(() {
           _refreshController.loadNoData();
         });
       }
     } catch (e) {
-      UIUtils.toaskError("$e");
+      UIUtils.toaskError(context,"$e");
       setState(() {
         _refreshController.loadFailed();
       });
@@ -346,7 +346,7 @@ abstract class QueryBeanDelegate {
 
   String get hintText;
 
-  Future<Response<Map>> query(BuildContext context, String query, int page);
+  Future<Map> query(BuildContext context, String query, int page);
 
   Widget buildItem(
       BuildContext context, final Map map, bool selected, VoidCallback onTap) {

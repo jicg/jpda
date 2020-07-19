@@ -139,15 +139,64 @@ class _PanDianPageState extends State<PanDianPage> {
     reLoadData();
   }
 
+//  Future<void> reLoadData() async {
+//    try {
+//      _loading = true;
+//      _page = 1;
+//      _param["page"] = _page;
+//      _datas = [];
+//      Response<Map> da =
+//          await JPda.web.query("jpda_pandian\$list", _param, context);
+//      List dd = json.decode(da.data["data"]);
+//      List<Map> d = dd.map((f) => f as Map).toList();
+//      if (d.length > 0) {
+//        _datas.addAll(d);
+//        _page++;
+//      }
+//    } catch (e) {
+//      print(e);
+//      UIUtils.toaskError(context,"$e");
+//    }
+//    setState(() {
+//      _loading = false;
+//    });
+//  }
+//
+//  Future<void> loadMoreData() async {
+//    try {
+//      _param["page"] = _page;
+//      Response<Map> da =
+//          await JPda.web.query( "jpda_pandian\$list", _param,context);
+//      List dd = json.decode(da.data["data"]);
+//      List<Map> d = dd.map((f) => f as Map).toList();
+//      if (d.length > 0) {
+//        _page++;
+//        _datas.addAll(d);
+//        setState(() {
+//          _refreshController.loadComplete();
+//        });
+//      } else {
+//        UIUtils.toaskError(context,"已经没有数据");
+//        setState(() {
+//          _refreshController.loadNoData();
+//        });
+//      }
+//    } catch (e) {
+//      setState(() {
+//        _refreshController.loadFailed();
+//      });
+//    }
+//  }
+
   Future<void> reLoadData() async {
     try {
       _loading = true;
       _page = 1;
       _param["page"] = _page;
       _datas = [];
-      Response<Map> da =
-          await JPda.web.query("jpda_pandian\$list", _param, context);
-      List dd = json.decode(da.data["data"]);
+      Map da =
+      await JPda.web.query2("jpda_pandian\$list", _param, context);
+      List dd = json.decode(da["data"]);
       List<Map> d = dd.map((f) => f as Map).toList();
       if (d.length > 0) {
         _datas.addAll(d);
@@ -155,7 +204,7 @@ class _PanDianPageState extends State<PanDianPage> {
       }
     } catch (e) {
       print(e);
-      UIUtils.toaskError("$e");
+      UIUtils.toaskError(context,"$e");
     }
     setState(() {
       _loading = false;
@@ -165,9 +214,9 @@ class _PanDianPageState extends State<PanDianPage> {
   Future<void> loadMoreData() async {
     try {
       _param["page"] = _page;
-      Response<Map> da =
-          await JPda.web.query( "jpda_pandian\$list", _param,context);
-      List dd = json.decode(da.data["data"]);
+      Map da =
+      await JPda.web.query2( "jpda_pandian\$list", _param,context);
+      List dd = json.decode(da["data"]);
       List<Map> d = dd.map((f) => f as Map).toList();
       if (d.length > 0) {
         _page++;
@@ -176,7 +225,7 @@ class _PanDianPageState extends State<PanDianPage> {
           _refreshController.loadComplete();
         });
       } else {
-        UIUtils.toaskError("已经没有数据");
+        UIUtils.toaskError(context,"已经没有数据");
         setState(() {
           _refreshController.loadNoData();
         });

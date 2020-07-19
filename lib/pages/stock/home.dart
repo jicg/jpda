@@ -53,7 +53,7 @@ class _StockHomeState extends State<StockHome> {
         _page++;
       }
     } catch (e) {
-      UIUtils.toaskError("$e");
+      UIUtils.toaskError(context,"$e");
     }
     setState(() {
       _loading = false;
@@ -74,13 +74,13 @@ class _StockHomeState extends State<StockHome> {
           _refreshController.loadComplete();
         });
       } else {
-        UIUtils.toaskError("已经没有数据");
+        UIUtils.toaskError(context,"已经没有数据");
         setState(() {
           _refreshController.loadNoData();
         });
       }
     } catch (e) {
-      UIUtils.toaskError("$e");
+      UIUtils.toaskError(context,"$e");
       setState(() {
         _refreshController.loadFailed();
       });
@@ -143,6 +143,7 @@ class _StockHomeState extends State<StockHome> {
         ),
       );
     }
+
     return SmartRefresher(
       controller: _refreshController,
       child: ListView.separated(

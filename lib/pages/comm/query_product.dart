@@ -15,9 +15,9 @@ class QueryProductPage extends StatelessWidget {
 
 class QueryProductDelegate extends QueryBeanDelegate {
   @override
-  Future<Response<Map>> query(BuildContext context,String query, int page) {
+  Future<Map> query(BuildContext context,String query, int page) {
     return JPda.web
-        .query("jpda_comm\$query_product", {"page": page, "query": query},context);
+        .query2("jpda_comm\$query_product", {"page": page, "query": query},context);
   }
 
   @override

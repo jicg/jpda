@@ -20,8 +20,8 @@ class QueryStoreDelegate extends QueryBeanDelegate {
   String get hintText => "店仓名称/店仓编号";
 
   @override
-  Future<Response<Map>> query(BuildContext context, String query, int page) {
-    return JPda.web.query(
+  Future<Map> query(BuildContext context, String query, int page) {
+    return JPda.web.query2(
          "jpda_comm\$query_store", {"query": query, "page": page},context);
   }
 

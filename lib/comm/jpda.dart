@@ -7,7 +7,7 @@ import 'package:jpda/getit/user.dart';
 import 'package:jpda/models/user.dart';
 
 class JPda {
-  static GetIt getIt = new GetIt();
+  static GetIt getIt =  GetIt.instance;
 
   static initGetIt() {
     getIt.registerSingleton<CacheModel>(new SPCache());
@@ -24,8 +24,8 @@ class JPda {
 //      Map<String, dynamic> user = json.decode(str);
 //      userModel.init = User.fromJson(user);
 //    });
-    dioModel.baseUrl = "http://192.168.0.160";
-    userModel.init = new User("root", "nea@burgeon.com.cn", "bos20");
+//    dioModel.baseUrl = "http://192.168.0.160";
+//    userModel.init = new User("root", "nea@burgeon.com.cn", "bos20");
 //    dioModel.baseUrl = "http://demo.sungeon.com:280";
 //    userModel.init = new User("root", "nea@burgeon.com.cn", "bos20");
     getIt.registerSingleton<DioModel>(dioModel);

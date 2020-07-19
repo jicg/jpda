@@ -164,10 +164,10 @@ class _DetailTitleWidgetState extends State<DetailTitleWidget>
           Expanded(
             child: Visibility(
               child: DefaultTextStyle(
-                style: Theme.of(context).primaryTextTheme.title,
+                style: Theme.of(context).primaryTextTheme.headline6,
                 child: widget.backBody,
               ),
-              visible: _controller.status != AnimationStatus.completed,
+              //visible: _controller.status != AnimationStatus.completed,
               maintainState: true,
             ),
           ),
@@ -185,10 +185,10 @@ class _DetailTitleWidgetState extends State<DetailTitleWidget>
                       color: Theme.of(context).canvasColor,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(
-                            (1.0 - _controller.value) * _kFrontClosedHeight +
+//                            (1.0 - _controller.value) * _kFrontClosedHeight +
                                 18),
                         topRight: Radius.circular(
-                            (1.0 - _controller.value) * _kFrontClosedHeight +
+//                            (1.0 - _controller.value) * _kFrontClosedHeight +
                                 18),
                       ),
                     ),
@@ -203,46 +203,49 @@ class _DetailTitleWidgetState extends State<DetailTitleWidget>
         rect: frontRelativeRect,
         child: ExcludeSemantics(
             child: Container(
-          alignment: Alignment.topLeft,
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: _toggleFrontLayer,
-            onVerticalDragUpdate: _handleDragUpdate,
-            onVerticalDragEnd: _handleDragEnd,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.black12,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(
-                      (1.0 - _controller.value) * _kFrontClosedHeight + 18),
-                  topRight: Radius.circular(
-                      (1.0 - _controller.value) * _kFrontClosedHeight + 18),
+              alignment: Alignment.topLeft,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: _toggleFrontLayer,
+                onVerticalDragUpdate: _handleDragUpdate,
+                onVerticalDragEnd: _handleDragEnd,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black12,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(
+//                          (1.0 - _controller.value) * _kFrontClosedHeight +
+                              18
+                      ),
+                      topRight: Radius.circular(
+//                          (1.0 - _controller.value) * _kFrontClosedHeight +
+                              18),
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      SizedBox(
+                        height: 18,
+                        child: Center(
+                            child: Container(
+                              color: Colors.grey,
+                              width: 45,
+                              height: 6,
+                            )),
+                      ),
+                      Container(
+                        height: 30,
+                        child: widget.frontHeading,
+                      ),
+                      Divider(
+                        height: 0,
+                      )
+                    ],
+                  ),
                 ),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  SizedBox(
-                    height: 18,
-                    child: Center(
-                        child: Container(
-                      color: Colors.grey,
-                      width: 45,
-                      height: 6,
-                    )),
-                  ),
-                  Container(
-                    height: 30,
-                    child: widget.frontHeading,
-                  ),
-                  Divider(
-                    height: 0,
-                  )
-                ],
-              ),
-            ),
-          ),
-        )),
+            )),
       ),
     );
 
@@ -277,7 +280,7 @@ class _CrossFadeTransition extends AnimatedWidget {
 
     final double opacity2 = CurvedAnimation(
       parent: progress,
-      curve: const Interval(0.5, 1.0),
+      curve: const Interval(0.5, 1),
     ).value;
 
     return Stack(
